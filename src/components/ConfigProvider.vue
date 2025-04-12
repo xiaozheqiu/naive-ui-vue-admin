@@ -33,5 +33,8 @@ const themeOverrides: GlobalThemeOverrides = {
   Card: {
     paddingMedium: "12px",
   },
+  Menu: {
+    itemHeight: "36px",
+  },
 };
 </script>

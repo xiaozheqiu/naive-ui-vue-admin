@@ -22,6 +22,7 @@ declare module 'vue' {
     NDropdown: typeof import('naive-ui')['NDropdown']
     NGlobalStyle: typeof import('naive-ui')['NGlobalStyle']
     NH2: typeof import('naive-ui')['NH2']
+    NIcon: typeof import('naive-ui')['NIcon']
     NLayout: typeof import('naive-ui')['NLayout']
     NLayoutContent: typeof import('naive-ui')['NLayoutContent']
     NLayoutFooter: typeof import('naive-ui')['NLayoutFooter']
@@ -30,5 +31,7 @@ declare module 'vue' {
     NMenu: typeof import('naive-ui')['NMenu']
     NThemeEditor: typeof import('naive-ui')['NThemeEditor']
     Provider: typeof import('./src/components/Provider/index.vue')['default']
+    RouterLink: typeof import('vue-router')['RouterLink']
+    RouterView: typeof import('vue-router')['RouterView']
   }
 }
