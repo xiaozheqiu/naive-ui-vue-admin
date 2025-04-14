@@ -4,10 +4,106 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>document</title>
+    <title>%VITE_APP_TITLE%</title>
+    <style>
+      html body,
+      #app {
+        height: 100vh;
+        overflow: hidden;
+      }
+      .loading-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        flex-direction: column;
+        line-height: 1.6;
+      }
+      .loading-wrapper .title {
+        font-weight: bold;
+        font-size: 42px;
+        color: rgb(65, 64, 64);
+      }
+      .loading-wrapper span {
+        display: inline-block;
+      }
+
+      .loading-wrapper div.animate span {
+        animation-name: var(--animation);
+        animation-duration: 0.4s;
+        animation-timing-function: ease-in-out;
+        animation-delay: var(--delay);
+      }
+
+      @keyframes jump {
+        0%,
+        100% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+
+      @keyframes pop {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.15);
+        }
+      }
+
+      @keyframes flip {
+        0%,
+        100% {
+          transform: rotateY(0deg);
+        }
+        50% {
+          transform: rotateY(90deg);
+        }
+      }
+
+      @keyframes blink {
+        0%,
+        100% {
+          color: inherit;
+        }
+        50% {
+          color: rgb(238, 238, 229);
+        }
+      }
+    </style>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app">
+      <div class="loading-wrapper">
+        <div class="title animate" style="--animation: flip">
+          %VITE_APP_TITLE%
+        </div>
+        <div style="color: #a0a0a0; margin-top: 30px">精彩即将呈现…</div>
+      </div>
+    </div>
+    <script type="text/javascript">
+      const animateList = ["flip", "blink", "pop", "jump"];
+      let index = 0;
+      const h1 = document.querySelector(".title");
+      h1.innerHTML = h1.textContent.replace(/\S/g, "<span>$&</span>");
+      document.querySelectorAll("span").forEach((span, index) => {
+        span.style.setProperty("--delay", `${index * 0.1}s`);
+      });
+      window.lodingInterval = setInterval(() => {
+        h1.style.setProperty(
+          "--animation",
+          animateList[index % animateList.length]
+        );
+        index++;
+        h1.classList.remove("animate");
+        void h1.offsetWidth;
+        h1.classList.add("animate");
+      }, ("Admin Work Pro".length * 0.1 + 0.8) * 1000);
+    </script>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

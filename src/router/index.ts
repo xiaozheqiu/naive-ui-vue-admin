@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { CommonRouter } from "./common";
+import { useTabsStore } from "../store/tabs";
 
 // 定义路由规则
 const routes = [
@@ -30,11 +31,13 @@ const router = createRouter({
 
 // 路由守卫
 router.beforeEach((to, from, next) => {
+  const tabsStore = useTabsStore();
   if (to.meta.requiresAuth) {
     const isAuthenticated = !!localStorage.getItem("token");
     if (!isAuthenticated) {
       next("/login");
     } else {
+      tabsStore.addTab(to);
       next();
     }
   } else {

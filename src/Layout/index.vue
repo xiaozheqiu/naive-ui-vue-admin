@@ -1,18 +1,27 @@
 <template>
   <div class="h-screen w-screen">
     <n-layout has-sider class="h-screen w-screen flex flex-row">
-      <SideMenus />
+      <side-menus />
 
       <n-layout
-        content-class="h-screen flex-grow flex flex-col gap-2"
+        content-class="h-screen flex-grow flex flex-col"
         :style="{
           backgroundColor: systemStore.theme === 'dark' ? '#333' : '#f0f2f5',
         }">
-        <CustomHeader />
+        <custom-header />
 
-        <div class="flex-grow p-2">
+        <!-- 渲染路由标签记录 -->
+        <router-tag-history />
+
+        <div class="flex-grow relative overflow-hidden">
           <!-- 渲染子路由 -->
-          <router-view></router-view>
+          <router-view
+            v-slot="{ Component, route }"
+            class="h-full absolute inset-0 p-2">
+            <transition name="fade">
+              <component :is="Component" :key="route.path" />
+            </transition>
+          </router-view>
         </div>
 
         <n-layout-footer bordered class="h-10 flex items-center justify-center">
@@ -26,6 +35,18 @@
 <script setup lang="ts">
 import CustomHeader from "./CustomHeader.vue";
 import SideMenus from "./SideMenus.vue";
+import RouterTagHistory from "./RouterTagHistory.vue";
 import { useSystemStore } from "../store/system";
 const systemStore = useSystemStore();
 </script>
+
+<style>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease-in-out;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>

@@ -3,9 +3,9 @@ import ConfigProvider from "./components/ConfigProvider.vue";
 </script>
 
 <template>
-  <ConfigProvider>
+  <config-provider>
     <router-view></router-view>
-  </ConfigProvider>
+  </config-provider>
 </template>
 
 <style scoped></style>

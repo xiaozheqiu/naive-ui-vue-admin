@@ -36,5 +36,8 @@ const themeOverrides: GlobalThemeOverrides = {
   Menu: {
     itemHeight: "36px",
   },
+  Popover: {
+    padding: 0,
+  },
 };
 </script>

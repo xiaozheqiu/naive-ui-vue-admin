@@ -14,6 +14,8 @@ import {
   Languages,
   Sun,
   Moon,
+  X,
+  Menu,
 } from "lucide-vue-next";
 import type { Component } from "vue";
 import { NIcon } from "naive-ui";
@@ -35,6 +37,8 @@ export const icons = {
   Languages,
   Sun,
   Moon,
+  X,
+  Menu,
 };
 
 export function renderIcon(icon: Component) {

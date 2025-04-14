@@ -1,6 +1,9 @@
 import { icons } from "../tools/icons";
 import type { RouteRecordRaw } from "vue-router";
 
+// tips: 如果懒加载的组件较大，加载时间较长，可以在加载期间显示一个加载动画。
+// Vue 提供了 defineAsyncComponent，可以结合 suspense 使用
+
 export const CommonRouter: RouteRecordRaw[] = [
   {
     path: "overview",
