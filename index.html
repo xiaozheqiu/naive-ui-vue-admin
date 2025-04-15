@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -93,16 +93,19 @@
       document.querySelectorAll("span").forEach((span, index) => {
         span.style.setProperty("--delay", `${index * 0.1}s`);
       });
-      window.lodingInterval = setInterval(() => {
-        h1.style.setProperty(
-          "--animation",
-          animateList[index % animateList.length]
-        );
-        index++;
-        h1.classList.remove("animate");
-        void h1.offsetWidth;
-        h1.classList.add("animate");
-      }, ("Admin Work Pro".length * 0.1 + 0.8) * 1000);
+      window.lodingInterval = setInterval(
+        () => {
+          h1.style.setProperty(
+            "--animation",
+            animateList[index % animateList.length],
+          );
+          index++;
+          h1.classList.remove("animate");
+          void h1.offsetWidth;
+          h1.classList.add("animate");
+        },
+        ("Admin Work Pro".length * 0.1 + 0.8) * 1000,
+      );
     </script>
     <script type="module" src="/src/main.ts"></script>
   </body>

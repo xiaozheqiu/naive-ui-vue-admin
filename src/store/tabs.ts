@@ -21,7 +21,7 @@ export const useTabsStore = defineStore("tabs", () => {
   const router = useRouter();
   // 从 sessionStorage 中获取 tabs
   const tabs = ref<Tab[]>(
-    JSON.parse(sessionStorage.getItem("tabs") || JSON.stringify(initTabs))
+    JSON.parse(sessionStorage.getItem("tabs") || JSON.stringify(initTabs)),
   );
 
   function addTab(route: RouteLocationNormalized) {
@@ -52,7 +52,7 @@ export const useTabsStore = defineStore("tabs", () => {
     (newTabs) => {
       sessionStorage.setItem("tabs", JSON.stringify(newTabs));
     },
-    { deep: true }
+    { deep: true },
   );
 
   return {

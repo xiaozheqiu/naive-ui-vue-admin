@@ -2,7 +2,8 @@
   <div
     class="flex w-full justify-between items-center gap-4"
     :style="{ backgroundColor: themeVars.cardColor }"
-    v-if="tabs.length > 0 && config.isShowRouteHistory">
+    v-if="tabs.length > 0 && config.isShowRouteHistory"
+  >
     <div class="flex flex-row flex-grow gap-2 overflow-x-auto p-1 items-center">
       <!-- 渲染路由标签记录 -->
       <n-tag
@@ -13,7 +14,8 @@
         checkable
         :bordered="false"
         class="transition-all group"
-        @click="$router.push(tab.path)">
+        @click="$router.push(tab.path)"
+      >
         <div class="w-min flex flex-row items-center gap-1">
           <span class="truncate">{{ tab.title }}</span>
           <custom-icon
@@ -21,7 +23,8 @@
             name="X"
             :size="16"
             class="group-hover:block cursor-pointer text-gray-400 hidden group-hover:text-green-500"
-            @click.stop="removeTab(tab.path)">
+            @click.stop="removeTab(tab.path)"
+          >
           </custom-icon>
         </div>
       </n-tag>
