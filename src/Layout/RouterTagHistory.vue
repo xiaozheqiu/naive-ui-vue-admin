@@ -34,8 +34,9 @@
         <custom-icon name="Menu" :size="16" class="mr-2"> </custom-icon
       ></template>
 
-      <div class="flex flex-col gap-2 p-2">
+      <div class="flex flex-col">
         <n-button
+          :bordered="false"
           v-for="option in options"
           :key="option.key"
           @click="option.click"

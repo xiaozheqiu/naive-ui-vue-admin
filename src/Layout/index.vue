@@ -7,7 +7,8 @@
         content-class="h-screen flex-grow flex flex-col"
         :style="{
           backgroundColor: systemStore.theme === 'dark' ? '#333' : '#f0f2f5',
-        }">
+        }"
+      >
         <custom-header />
 
         <!-- 渲染路由标签记录 -->
@@ -16,8 +17,10 @@
         <div class="flex-grow relative overflow-hidden">
           <!-- 渲染子路由 -->
           <router-view
+            :key="routeKey"
             v-slot="{ Component, route }"
-            class="h-full absolute inset-0 p-2">
+            class="h-full absolute inset-0 p-2"
+          >
             <transition name="fade">
               <component :is="Component" :key="route.path" />
             </transition>
@@ -37,7 +40,18 @@ import CustomHeader from "./CustomHeader.vue";
 import SideMenus from "./SideMenus.vue";
 import RouterTagHistory from "./RouterTagHistory.vue";
 import { useSystemStore } from "../store/system";
+import { ref, watch } from "vue";
+import { useRoute } from "vue-router";
 const systemStore = useSystemStore();
+const route = useRoute();
+const routeKey = ref(route.fullPath);
+
+watch(
+  () => route.fullPath,
+  (newPath) => {
+    routeKey.value = `${newPath}?reload=${Date.now()}`; // 确保 key 的值变化
+  },
+);
 </script>
 
 <style>

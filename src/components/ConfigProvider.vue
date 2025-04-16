@@ -3,7 +3,8 @@
     :theme="systemStore.theme === 'dark' ? darkTheme : undefined"
     :locale="zhCN"
     :date-locale="dateZhCN"
-    :theme-overrides="themeOverrides">
+    :theme-overrides="themeOverrides"
+  >
     <n-theme-editor
       ><slot></slot>
       <n-global-style />
@@ -13,7 +14,6 @@
 
 <script lang="ts" setup>
 import type { GlobalThemeOverrides } from "naive-ui";
-import { defineProps } from "vue";
 import { zhCN, dateZhCN } from "naive-ui";
 import { useSystemStore } from "../store/system";
 import { darkTheme } from "naive-ui";

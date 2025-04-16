@@ -4,7 +4,9 @@ import ConfigProvider from "./components/ConfigProvider.vue";
 
 <template>
   <config-provider>
-    <router-view></router-view>
+    <n-message-provider>
+      <router-view></router-view>
+    </n-message-provider>
   </config-provider>
 </template>
 
