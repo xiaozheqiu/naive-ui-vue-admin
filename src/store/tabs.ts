@@ -9,13 +9,13 @@ export interface Tab {
   isCancel?: boolean; // 是否可以关闭
 }
 
-const initTabs = [
-  {
-    title: "首页",
-    path: "/",
-    href: "/",
-    isCancel: true,
-  },
+const initTabs: Tab[] = [
+  // {
+  //   title: "首页",
+  //   path: "/",
+  //   href: "/",
+  //   isCancel: true,
+  // },
 ];
 export const useTabsStore = defineStore("tabs", () => {
   const router = useRouter();
@@ -36,13 +36,16 @@ export const useTabsStore = defineStore("tabs", () => {
   }
 
   function removeTab(path: string) {
+    if (router.currentRoute.value.path === path) {
+      router.push("/");
+    }
     tabs.value = tabs.value.filter((tab) => tab.path !== path);
   }
 
   function clearTabs() {
     tabs.value = initTabs;
     setTimeout(() => {
-      router.push("/home");
+      router.push("/");
     }, 100);
   }
 

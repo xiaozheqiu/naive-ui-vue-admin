@@ -4,7 +4,8 @@
     :size="props.size || 18"
     :color="props.color"
     @click="props.click"
-    :class="props?.class ?? 'hover:text-green-500'">
+    :class="props?.class ?? 'hover:text-green-500'"
+  >
     <component :is="icon" :strokeWidth="props.strokeWidth ?? 1" />
   </n-icon>
 
@@ -15,7 +16,8 @@
     :size="props.size || 18"
     :color="props.color"
     @click="props.click"
-    :class="props?.class ?? ''" />
+    :class="props?.class ?? ''"
+  />
 </template>
 
 <script setup lang="ts">
@@ -28,7 +30,7 @@ interface CustomIconProps {
   size?: number;
   color?: string;
   strokeWidth?: number;
-  class?: string;
+  class?: string | string[];
   click?: () => void;
   isOnlyIcon?: boolean;
 }

@@ -4,13 +4,27 @@
     bordered
     ><div class="flex justify-start items-center gap-2">
       <custom-icon
-        :name="isSidebarCollapsed ? 'PanelLeftOpen' : 'PanelLeftClose'"
+        v-if="isSidebarCollapsed"
+        name="PanelLeftOpen"
+        @click="setSidebarCollapsed(!isSidebarCollapsed)"
+      ></custom-icon>
+
+      <custom-icon
+        v-if="!isSidebarCollapsed"
+        name="PanelLeftClose"
         @click="setSidebarCollapsed(!isSidebarCollapsed)"
       ></custom-icon>
       <n-breadcrumb>
-        <n-breadcrumb-item>北京总行</n-breadcrumb-item>
-        <n-breadcrumb-item>天津分行</n-breadcrumb-item>
-        <n-breadcrumb-item>平山道支行</n-breadcrumb-item>
+        <n-breadcrumb-item @click="$router.push('/')">
+          <custom-icon name="House"></custom-icon>
+        </n-breadcrumb-item>
+        <n-breadcrumb-item
+          v-for="item in breadcrumbItems"
+          :key="item.path"
+          :clickable="false"
+        >
+          {{ item.meta?.title || item.name }}
+        </n-breadcrumb-item>
       </n-breadcrumb>
     </div>
     <div class="flex justify-end items-center gap-4">
@@ -66,7 +80,7 @@
           />
           <div class="">超级管理员</div>
           <n-icon
-            class="group-hover:text-green-500 transition-transform group-hover:rotate-180"
+            class="group-hover:text-green-500 transition-transform duration-300 group-hover:rotate-180 inline-flex items-center justify-center"
           >
             <custom-icon name="ChevronDown" class=" "></custom-icon>
           </n-icon>
@@ -81,8 +95,8 @@ import { storeToRefs } from "pinia";
 import { icons, renderIcon } from "../tools/icons";
 import { useSystemStore } from "../store/system";
 import { useMessage } from "naive-ui";
-import { onMounted, onUnmounted, ref } from "vue";
-import { useRouter, useRoute } from "vue-router";
+import { onMounted, onUnmounted, ref, computed } from "vue"; // Import computed
+import { useRouter, useRoute, type RouteLocationMatched } from "vue-router"; // Import RouteLocationMatched
 const { theme, isSidebarCollapsed } = storeToRefs(useSystemStore());
 const { setSidebarCollapsed, changeTheme, setLanguage } = useSystemStore();
 const message = useMessage();
@@ -130,6 +144,17 @@ const languagesOptions = [
     },
   },
 ];
+
+// Computed property for breadcrumb items
+const breadcrumbItems = computed(() => {
+  // Filter routes that have a title or name, and exclude the root '/' unless it's the only match
+  const matched = route.matched.filter((item) => item.meta?.title || item.name);
+  if (matched.length > 1) {
+    return matched.filter((item) => item.path !== "/"); // Exclude root if other items exist
+  }
+  console.log(matched, "matched");
+  return matched; // Return all matches if only one (or none) exists
+});
 
 function fullScreenChange() {
   const element = document.documentElement;

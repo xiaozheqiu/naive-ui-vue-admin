@@ -2,7 +2,7 @@
   <div
     class="flex w-full justify-between items-center gap-4"
     :style="{ backgroundColor: themeVars.cardColor }"
-    v-if="tabs.length > 0 && config.isShowRouteHistory"
+    v-if="config.isShowRouteHistory"
   >
     <div class="flex flex-row flex-grow gap-2 overflow-x-auto p-1 items-center">
       <!-- 渲染路由标签记录 -->
@@ -19,10 +19,14 @@
         <div class="w-min flex flex-row items-center gap-1">
           <span class="truncate">{{ tab.title }}</span>
           <custom-icon
-            v-if="tab.path !== route.path && tab.isCancel"
             name="X"
             :size="16"
-            class="group-hover:block cursor-pointer text-gray-400 hidden group-hover:text-green-500"
+            :class="[
+              'cursor-pointer text-gray-400 w-0 opacity-0 group-hover:w-4 group-hover:opacity-100 transition-all duration-300 ease-in-out',
+              tab.path === route.path
+                ? 'group-hover:text-white'
+                : 'group-hover:text-green-500',
+            ]"
             @click.stop="removeTab(tab.path)"
           >
           </custom-icon>
@@ -51,7 +55,7 @@
 import { useThemeVars } from "naive-ui";
 import { storeToRefs } from "pinia";
 import { useTabsStore } from "../store/tabs";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import CustomIcon from "../components/CustomIcon.vue";
 import config from "../config";
 
@@ -60,12 +64,17 @@ const { tabs } = storeToRefs(useTabsStore());
 const themeVars = useThemeVars();
 const route = useRoute();
 
+const router = useRouter();
+
 const options = [
   {
     label: "刷新页面",
     key: "refreshPage",
     click: () => {
-      window.location.reload();
+      router.replace({
+        path: route.path, // 保持路径不变
+        query: { ...route.query, t: Date.now() }, // 添加时间戳
+      });
     },
   },
   {

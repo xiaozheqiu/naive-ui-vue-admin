@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { CommonRouter } from "./common";
 import { useTabsStore } from "../store/tabs";
+import NotFound from "@/views/NotFound.vue"; // 确保路径正确
 
 // 定义路由规则
 const routes = [
@@ -18,8 +19,18 @@ const routes = [
     path: "/",
     component: () => import("../Layout/index.vue"),
     meta: { requiresAuth: true },
-    redirect: "/overview",
+    redirect: "/overview/sub-overview",
     children: CommonRouter,
+  },
+  // 404 Route - Must be the last route
+  {
+    path: "/:pathMatch(.*)*", // Vue Router 4 syntax for catch-all routes
+    name: "NotFound",
+    component: NotFound,
+    meta: {
+      title: "页面未找到",
+      hideInMenu: true, // 通常不在菜单中显示 404
+    },
   },
 ];
 

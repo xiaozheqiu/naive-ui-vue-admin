@@ -17,6 +17,7 @@ import {
   X,
   Menu,
   Shrink,
+  House,
 } from "lucide-vue-next";
 import type { Component } from "vue";
 import { NIcon } from "naive-ui";
@@ -41,6 +42,7 @@ export const icons = {
   X,
   Menu,
   Shrink,
+  House,
 };
 
 export function renderIcon(icon: Component) {
