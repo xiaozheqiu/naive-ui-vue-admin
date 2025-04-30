@@ -7,6 +7,9 @@ import type {
   InternalAxiosRequestConfig,
   CancelTokenSource,
 } from "axios";
+import { createDiscreteApi } from "naive-ui";
+import { stringify } from "qs"; // 用于序列化参数
+const { message: MessageApi } = createDiscreteApi(["message"]);
 
 // 定义请求配置类型（可扩展）
 interface RequestConfig extends AxiosRequestConfig {
@@ -39,12 +42,14 @@ export class HttpService {
 
   constructor(options?: InitOptions) {
     this.instance = axios.create({
-      baseURL: options?.baseURL || "http://api.example.com", // 替换为你的 API 地址
+      baseURL: options?.baseURL || import.meta.env.VITE_API_BASE_URL,
       timeout: options?.timeout || 10000, // 超时时间
       headers: {
         "Content-Type": "application/json",
         ...(options?.headers || {}),
       },
+      paramsSerializer: (params) =>
+        stringify(params, { arrayFormat: "brackets" }), // 使用 qs 库进行参数序列化，以支持复杂对象
     });
 
     this.pendingRequests = new Map();
@@ -53,15 +58,14 @@ export class HttpService {
     this.instance.interceptors.request.use(
       (config: InternalAxiosRequestConfig) => {
         const token = localStorage.getItem("token");
-        if (token) {
+        if (token && config.headers) {
           config.headers.Authorization = `Bearer ${token}`;
         }
 
-        // 取消重复请求
+        // 取消重复请求 - 优化 key 生成
         const requestKey = this.getRequestKey(config);
-        if (this.pendingRequests.has(requestKey)) {
-          this.pendingRequests.get(requestKey)?.cancel("重复请求被取消");
-        }
+        this.removePendingRequest(config); // 先移除旧的，避免取消自身
+
         const source = axios.CancelToken.source();
         config.cancelToken = source.token;
         this.pendingRequests.set(requestKey, source);
@@ -69,64 +73,107 @@ export class HttpService {
         return config;
       },
       (error: AxiosError) => {
+        console.error("Request Error:", error); // 请求错误通常是配置问题，直接拒绝
         return Promise.reject(error);
       },
     );
 
-    // 响应拦截器 - 这里进行了优化，直接返回 response.data
+    // 响应拦截器
     this.instance.interceptors.response.use(
       (response: AxiosResponse<ApiResponse>) => {
+        this.removePendingRequest(response.config); // 移除已完成的请求
+
+        // 增加对 response.data 结构的校验
+        if (typeof response.data !== "object" || response.data === null) {
+          console.error(
+            "API Response Format Error: response.data is not an object",
+            response,
+          );
+          return Promise.reject(new Error("服务器响应格式错误"));
+        }
+
         const { code, message, data } = response.data;
 
-        // 移除已完成的请求
-        const requestKey = this.getRequestKey(response.config);
-        this.pendingRequests.delete(requestKey);
-
         if (code !== 200) {
-          console.error(`API Error: ${message}`);
-          return Promise.reject({ code, message });
+          console.error(`API Logic Error [${code}]: ${message}`);
+          return Promise.reject({ isApiError: true, code, message, data });
         }
 
-        // 直接返回 response.data，这样方法就不需要重复 return response.data
-        return data;
+        return data; // 成功，直接返回核心数据
       },
       (error: AxiosError<ApiErrorResponse>) => {
-        // 处理请求被取消的情况
-        if (axios.isCancel(error)) {
-          console.log("请求被取消:", error.message);
-          return Promise.reject(error);
-        }
-
-        const status = error.response?.status || 500;
-        const errorMessage =
-          error.response?.data?.message ||
-          error.message ||
-          "网络错误或服务器未响应";
-
-        // 移除已完成的请求
         if (error.config) {
-          const requestKey = this.getRequestKey(error.config);
-          this.pendingRequests.delete(requestKey);
+          this.removePendingRequest(error.config); // 移除请求（无论成功失败）
         }
 
-        // 全局错误提示（例如使用 toast）
-        console.error(`HTTP Error ${status}: ${errorMessage}`);
-        alert(`错误 ${status}: ${errorMessage}`); // 替换为实际的 UI 提示库
+        if (axios.isCancel(error)) {
+          console.log("Request canceled:", error.message);
+          return Promise.reject({ isCancel: true, message: error.message });
+        }
 
-        return Promise.reject({ status, message: errorMessage });
+        const { response, request = null, message = "" } = error;
+
+        let status = 500;
+        let errorMessage = "网络错误或服务器无法响应";
+
+        // 直接处理 Axios 错误
+        if (response) {
+          const { data } = response || {};
+          const { code, message } = data || {};
+          status = code || 500;
+          errorMessage = message || errorMessage;
+        }
+        // 处理不同的错误状态码
+        else if (request) {
+          console.log("Network Error or No Response:", request);
+          errorMessage = message?.includes("timeout")
+            ? "请求超时"
+            : errorMessage;
+        } else {
+          console.log("Axios Setup Error:", message);
+          errorMessage = `请求配置错误 ${message}`;
+        }
+
+        MessageApi.error(`Error ${status}: ${errorMessage}`);
+        return Promise.reject({
+          status,
+          message: errorMessage,
+          error,
+        });
       },
     );
   }
 
-  // 辅助方法：生成请求的唯一键
-  private getRequestKey(config: AxiosRequestConfig): string {
-    return `${config.method}:${config.url}`;
+  // 辅助方法：生成请求的唯一键（考虑方法、URL、参数和数据）
+  private getRequestKey(
+    config: AxiosRequestConfig | InternalAxiosRequestConfig,
+  ): string {
+    const { method, url, params, data } = config;
+    return [
+      method || "get",
+      url,
+      JSON.stringify(params),
+      JSON.stringify(data),
+    ].join("&");
+  }
+
+  // 辅助方法：移除挂起的请求
+  private removePendingRequest(
+    config: AxiosRequestConfig | InternalAxiosRequestConfig,
+  ): void {
+    const requestKey = this.getRequestKey(config);
+    if (this.pendingRequests.has(requestKey)) {
+      this.pendingRequests.delete(requestKey);
+    }
   }
 
   // 封装 GET 请求
-  public async get<T>(url: string, config?: RequestConfig): Promise<T> {
-    // 由于拦截器已经处理了 response.data，这里直接返回
-    return this.instance.get(url, config);
+  public async get<T>(
+    url: string,
+    params?: any,
+    config?: Omit<RequestConfig, "params">,
+  ): Promise<T> {
+    return this.instance.get(url, { ...config, params }); // 将 params 合并到 config 中
   }
 
   // 封装 POST 请求
@@ -156,52 +203,93 @@ export class HttpService {
   public async uploadFile<T>(
     url: string,
     file: File,
-    config?: RequestConfig,
+    data?: Record<string, any>, // 允许附带其他表单数据
+    config?: RequestConfig, // 排除 headers，因为内部会设置
   ): Promise<T> {
     const formData = new FormData();
     formData.append("file", file);
+
+    if (data) {
+      for (const key in data) {
+        if (Object.prototype.hasOwnProperty.call(data, key)) {
+          formData.append(key, data[key]);
+        }
+      }
+    }
 
     return this.instance.post(url, formData, {
       ...config,
       headers: {
         "Content-Type": "multipart/form-data",
+        ...(config?.headers || {}),
       },
     });
   }
 
-  // 文件下载 - 特殊情况，需要返回 Blob 而不是 ApiResponse
+  // 文件下载
   public async downloadFile(
     url: string,
-    config?: RequestConfig,
+    params?: any, // 添加 params 支持
+    config?: Omit<
+      RequestConfig,
+      "params" | "responseType" | "transformResponse"
+    >,
   ): Promise<Blob> {
-    return await this.instance.get(url, {
-      ...config,
-      responseType: "blob",
-      // 临时取消拦截器对响应数据的处理，因为下载文件返回的是 Blob 而不是 JSON
-      transformResponse: [(data) => data],
-    });
+    try {
+      const response = await this.instance.get<Blob>(url, {
+        ...config,
+        params,
+        responseType: "blob",
+        transformResponse: [(data) => data], // 覆盖响应拦截器，直接返回原始响应体 (Blob)
+      });
+      return response; // 直接返回 Blob 数据
+    } catch (error: any) {
+      if (
+        error &&
+        error.response &&
+        error.response.data instanceof Blob &&
+        error.response.data.type.includes("application/json")
+      ) {
+        const errorJson = await error.response.data.text();
+        try {
+          const errorData = JSON.parse(errorJson);
+          console.error("Download failed with JSON error:", errorData);
+          throw { isApiError: true, ...errorData };
+        } catch (parseError) {
+          console.error("Failed to parse download error response:", parseError);
+        }
+      }
+      throw error; // 否则，重新抛出原始或处理过的错误
+    }
   }
 
   // 取消所有挂起的请求
   public cancelAllRequests(message: string = "操作被取消"): void {
-    this.pendingRequests.forEach((source) => {
-      source.cancel(message);
+    this.pendingRequests.forEach((source, key) => {
+      source.cancel(`${message} (Request: ${key})`);
     });
     this.pendingRequests.clear();
   }
 
   // 取消特定请求
-  public cancelRequest(url: string, method: string = "get"): void {
-    const requestKey = `${method}:${url}`;
+  public cancelRequest(
+    url: string,
+    method: string = "get",
+    params?: any,
+    data?: any,
+  ): void {
+    const requestKey = this.getRequestKey({ url, method, params, data });
     if (this.pendingRequests.has(requestKey)) {
       const source = this.pendingRequests.get(requestKey);
-      source?.cancel("请求被手动取消");
+      source?.cancel(`请求 ${method.toUpperCase()} ${url} 被手动取消`);
       this.pendingRequests.delete(requestKey);
+    } else {
+      console.warn(`No pending request found for key: ${requestKey}`);
     }
   }
 }
 
 // 导出实例
-const http = new HttpService(); // 替换为你的 API 地址和超时时间
+const http = new HttpService(); // 使用默认配置
 
 export default http;

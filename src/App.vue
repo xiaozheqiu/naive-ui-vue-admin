@@ -1,13 +1,14 @@
-<script setup lang="ts">
-import ConfigProvider from "./components/ConfigProvider.vue";
-</script>
-
 <template>
-  <config-provider>
-    <n-message-provider>
+  <n-message-provider>
+    <custom-config-provider>
       <router-view></router-view>
-    </n-message-provider>
-  </config-provider>
+    </custom-config-provider>
+  </n-message-provider>
 </template>
+
+<script setup lang="ts">
+
+import CustomConfigProvider from "./components/CustomConfigProvider.vue";
+</script>
 
 <style scoped></style>

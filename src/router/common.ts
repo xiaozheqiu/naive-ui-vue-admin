@@ -1,6 +1,5 @@
 import { icons } from "../tools/icons";
 import type { RouteRecordRaw } from "vue-router";
-import NotFound from "@/views/NotFound.vue";
 
 // tips: 如果懒加载的组件较大，加载时间较长，可以在加载期间显示一个加载动画。
 // Vue 提供了 defineAsyncComponent，可以结合 suspense 使用
@@ -9,6 +8,8 @@ export const CommonRouter: RouteRecordRaw[] = [
   {
     path: "overview",
     name: "Overview",
+    // 添加重定向到第一个子路由
+    redirect: "/overview/sub-overview",
     meta: {
       title: "Overview",
       icon: icons.PanelLeftOpen,

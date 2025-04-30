@@ -9,6 +9,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     ConfigProvider: typeof import('./src/components/ConfigProvider.vue')['default']
+    CustomConfigProvider: typeof import('./src/components/CustomConfigProvider.vue')['default']
     CustomIcon: typeof import('./src/components/CustomIcon.vue')['default']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     NAvatar: typeof import('naive-ui')['NAvatar']

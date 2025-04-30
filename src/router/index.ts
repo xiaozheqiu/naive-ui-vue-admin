@@ -22,9 +22,9 @@ const routes = [
     redirect: "/overview/sub-overview",
     children: CommonRouter,
   },
-  // 404 Route - Must be the last route
+
   {
-    path: "/:pathMatch(.*)*", // Vue Router 4 syntax for catch-all routes
+    path: "/:pathMatch(.*)*",
     name: "NotFound",
     component: NotFound,
     meta: {

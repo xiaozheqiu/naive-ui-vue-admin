@@ -10,22 +10,26 @@
     class="h-full flex flex-col"
     :collapsed="isSidebarCollapsed"
     @collapse="setSidebarCollapsed(true)"
-    @expand="setSidebarCollapsed(false)">
+    @expand="setSidebarCollapsed(false)"
+  >
     <div class="logo h-[48px] flex items-center gap-2 justify-center">
       <img src="/logo.png" alt="Logo" class="h-8 w-8" />
       <div
         class="text-lg font-bold whitespace-nowrap overflow-hidden min-w-10"
-        v-if="!isSidebarCollapsed">
+        v-if="!isSidebarCollapsed"
+      >
         My Application
       </div>
     </div>
     <n-menu
-      :collapsed-width="64"
-      :collapsed-icon-size="22"
+      :collapsed-width="60"
+      :icon-size="18"
+      :collapsed-icon-size="18"
       :options="sideMenusOptions"
       class="flex-grow"
       :value="currentKey"
-      @update:value="onMenuChange" />
+      @update:value="onMenuChange"
+    />
   </n-layout-sider>
 </template>
 
@@ -52,7 +56,7 @@ function onMenuChange(key: string, item: MenuOption) {
 
 function mapRoutesToMenuOptions(
   routes: RouteRecordRaw[],
-  parentPath: string = ""
+  parentPath: string = "",
 ): Array<{
   label: string | undefined;
   key: string;
@@ -64,8 +68,8 @@ function mapRoutesToMenuOptions(
     const fullPath = route.path.startsWith("/")
       ? route.path // 如果路径以'/'开头，将其用作绝对路径
       : parentPath
-      ? `${parentPath}/${route.path}`.replace(/\/+/g, "/") // 与父路径连接并将多个斜杠规范化为单个斜杠
-      : `/${route.path}`; // 为根级路径添加前导斜杠
+        ? `${parentPath}/${route.path}`.replace(/\/+/g, "/") // 与父路径连接并将多个斜杠规范化为单个斜杠
+        : `/${route.path}`; // 为根级路径添加前导斜杠
 
     return {
       label: route.name as string | undefined,

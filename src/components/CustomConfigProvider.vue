@@ -5,8 +5,8 @@
     :date-locale="dateZhCN"
     :theme-overrides="themeOverrides"
   >
-    <n-theme-editor
-      ><slot></slot>
+    <n-theme-editor>
+      <slot></slot>
       <n-global-style />
     </n-theme-editor>
   </n-config-provider>
@@ -32,12 +32,15 @@ const themeOverrides: GlobalThemeOverrides = {
   },
   Card: {
     paddingMedium: "12px",
+    paddingLarge: "24px",
   },
   Menu: {
-    itemHeight: "36px",
+    itemHeight: "30px",
   },
-  Popover: {
-    padding: 0,
+  Dropdown: {
+    optionHeightSmall: "28px",
+    optionHeightMedium: "28px",
+    optionHeightLarge: "28px",
   },
 };
 </script>
