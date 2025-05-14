@@ -52,16 +52,14 @@
 </template>
 
 <script setup lang="ts">
-import { useThemeVars } from "naive-ui";
 import { storeToRefs } from "pinia";
 import { useTabsStore } from "../store/tabs";
 import { useRoute, useRouter } from "vue-router";
-import CustomIcon from "../components/CustomIcon.vue";
-import config from "../config";
+import CustomIcon from "@/components/CustomIcon.vue";
+import config from "@/config";
 
 const { removeTab, clearTabs } = useTabsStore();
 const { tabs } = storeToRefs(useTabsStore());
-const themeVars = useThemeVars();
 const route = useRoute();
 
 const router = useRouter();

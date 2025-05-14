@@ -1,19 +1,16 @@
 <template>
-  <n-layout-sider
-    bordered
-    show-trigger
-    collapse-mode="width"
+  <a-layout-sider
     :collapsed-width="64"
     :width="240"
-    :native-scrollbar="false"
-    style="max-height: 100%"
-    class="h-full flex flex-col"
+    :trigger="null"
+    class="h-full flex flex-col max-h-full"
+    collapsible="true"
     :collapsed="isSidebarCollapsed"
-    @collapse="setSidebarCollapsed(true)"
-    @expand="setSidebarCollapsed(false)"
+    @collapse="(val: boolean) => setSidebarCollapsed(val)"
+    :theme="theme"
   >
-    <div class="logo h-[48px] flex items-center gap-2 justify-center">
-      <img src="/logo.png" alt="Logo" class="h-8 w-8" />
+    <div class="logo h-[56px] flex items-center gap-2 justify-center">
+      <img src="/logo.svg" alt="Logo" class="h-8 w-8" />
       <div
         class="text-lg font-bold whitespace-nowrap overflow-hidden min-w-10"
         v-if="!isSidebarCollapsed"
@@ -21,32 +18,32 @@
         My Application
       </div>
     </div>
-    <n-menu
-      :collapsed-width="60"
-      :icon-size="18"
-      :collapsed-icon-size="18"
-      :options="sideMenusOptions"
+    <a-menu
+      :items="sideMenusOptions"
       class="flex-grow"
       :value="currentKey"
       @update:value="onMenuChange"
+      :theme="theme"
     />
-  </n-layout-sider>
+  </a-layout-sider>
 </template>
 
 <script setup lang="ts">
-import { type MenuOption } from "naive-ui";
 import { storeToRefs } from "pinia";
-import { ref } from "vue";
+import { ref, h } from "vue";
 import { useRouter, type RouteRecordRaw } from "vue-router";
 import { CommonRouter } from "../router/common";
 import { useSystemStore } from "../store/system";
-import { renderIcon } from "../tools/icons";
+import CustomIcon from "@/components/CustomIcon.vue";
+const { theme } = storeToRefs(useSystemStore());
+import { theme as antTheme } from "ant-design-vue";
 
 const router = useRouter();
 const currentKey = ref(router.currentRoute.value.path);
 
 const { isSidebarCollapsed } = storeToRefs(useSystemStore());
 const { setSidebarCollapsed } = useSystemStore();
+const { token } = antTheme.useToken();
 
 function onMenuChange(key: string, item: MenuOption) {
   console.log(key, item, "onMenuChange", currentKey.value);
@@ -60,7 +57,7 @@ function mapRoutesToMenuOptions(
 ): Array<{
   label: string | undefined;
   key: string;
-  icon?: ReturnType<typeof renderIcon>;
+  icon?: ReturnType<typeof any>;
   children?: any;
 }> {
   return routes.map((route) => {
@@ -74,7 +71,9 @@ function mapRoutesToMenuOptions(
     return {
       label: route?.meta?.title as string | undefined,
       key: fullPath,
-      icon: route.meta?.icon ? renderIcon(route.meta.icon) : undefined,
+      icon: route.meta?.icon
+        ? () => h(CustomIcon, { name: route?.meta?.icon, isOnlyIcon: true })
+        : undefined,
       children: route.children
         ? mapRoutesToMenuOptions(route.children, fullPath)
         : undefined,
@@ -83,4 +82,5 @@ function mapRoutesToMenuOptions(
 }
 
 const sideMenusOptions = mapRoutesToMenuOptions(CommonRouter);
+console.log(sideMenusOptions, "sideMenusOptions");
 </script>

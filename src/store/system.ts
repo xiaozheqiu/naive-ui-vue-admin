@@ -1,6 +1,5 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import i18n from "../locales";
 
 export const useSystemStore = defineStore(
   "system",
@@ -10,9 +9,7 @@ export const useSystemStore = defineStore(
     const language = ref<"zh" | "en">("zh");
 
     function setLanguage(newLanguage: "zh" | "en") {
-      console.log(i18n, "i18n");
       language.value = newLanguage;
-      i18n.global.locale = newLanguage;
     }
 
     // 是否收起侧边栏

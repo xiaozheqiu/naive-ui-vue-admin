@@ -1,33 +1,33 @@
 <template>
-  <n-layout-header
-    class="h-[48px] px-2 flex justify-between items-center"
-    bordered
-    ><div class="flex justify-start items-center gap-2">
+  <a-layout-header
+    class="!pl-4 !pr-4 flex justify-between items-center !h-[56px]"
+    :style="{ background: token.colorBgContainer }"
+  >
+    <div class="flex justify-start items-center gap-2 flex-grow">
       <custom-icon
         v-if="isSidebarCollapsed"
         name="PanelLeftOpen"
         @click="setSidebarCollapsed(!isSidebarCollapsed)"
       ></custom-icon>
-
       <custom-icon
         v-if="!isSidebarCollapsed"
         name="PanelLeftClose"
         @click="setSidebarCollapsed(!isSidebarCollapsed)"
       ></custom-icon>
-      <n-breadcrumb>
-        <n-breadcrumb-item @click="$router.push('/')">
-          <custom-icon name="House"></custom-icon>
-        </n-breadcrumb-item>
-        <n-breadcrumb-item
+
+      <!-- 路由导航栏 -->
+      <a-breadcrumb>
+        <a-breadcrumb-item @click="$router.push('/')">首页</a-breadcrumb-item>
+        <a-breadcrumb-item
           v-for="item in breadcrumbItems"
           :key="item.path"
           :clickable="false"
         >
           {{ item.meta?.title || item.name }}
-        </n-breadcrumb-item>
-      </n-breadcrumb>
+        </a-breadcrumb-item>
+      </a-breadcrumb>
     </div>
-    <div class="flex justify-end items-center gap-4">
+    <div class="flex justify-end items-center gap-2">
       <custom-icon
         name="Expand"
         @click="fullScreenChange"
@@ -41,21 +41,18 @@
 
       <custom-icon name="RotateCw" @click="reloadCurrentPage"></custom-icon>
 
-      <n-popover>
-        <template #trigger>
-          <custom-icon name="Languages"></custom-icon>
+      <a-dropdown>
+        <custom-icon name="Languages" @click.prevent></custom-icon>
+        <template #overlay>
+          <a-menu>
+            <a-menu-item v-for="option in languagesOptions" :key="option.key">
+              <a href="javascript:;" @click="option.click">
+                {{ option.label }}
+              </a>
+            </a-menu-item>
+          </a-menu>
         </template>
-
-        <div class="flex flex-col">
-          <n-button
-            :bordered="false"
-            v-for="option in languagesOptions"
-            :key="option.key"
-            @click="option.click"
-            >{{ option.label }}</n-button
-          >
-        </div>
-      </n-popover>
+      </a-dropdown>
 
       <custom-icon name="Bell"></custom-icon>
 
@@ -71,39 +68,51 @@
         v-if="theme !== 'dark'"
       ></custom-icon>
 
-      <n-dropdown :options="dropdownOptions" @select="onDropdownSelect">
-        <div class="flex items-center gap-2 group">
-          <n-avatar
-            round
+      <a-dropdown class="!leading-[40px]">
+        <div class="flex items-center group gap-0.5">
+          <a-avatar
             size="small"
             src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg"
           />
-          <div class="">超级管理员</div>
-          <n-icon
+          <span>超级管理员</span>
+
+          <custom-icon
+            name="ChevronDown"
             class="group-hover:text-green-500 transition-transform duration-300 group-hover:rotate-180 inline-flex items-center justify-center"
-          >
-            <custom-icon name="ChevronDown" class=" "></custom-icon>
-          </n-icon>
+            is-only-icon
+          ></custom-icon>
         </div>
-      </n-dropdown>
+        <template #overlay>
+          <a-menu>
+            <a-menu-item v-for="option in dropdownOptions" :key="option.key">
+              <a href="javascript:;">
+                <component :is="option.icon" v-if="option.icon" />
+                {{ option.label }}
+              </a>
+            </a-menu-item>
+          </a-menu>
+        </template>
+      </a-dropdown>
     </div>
-  </n-layout-header>
+  </a-layout-header>
 </template>
 
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
-import { icons, renderIcon } from "../tools/icons";
+import CustomIcon from "@/components/CustomIcon.vue";
 import { useSystemStore } from "../store/system";
-import { useMessage } from "naive-ui";
-import { onMounted, onUnmounted, ref, computed } from "vue";
+import { message } from "ant-design-vue";
+import { onMounted, onUnmounted, ref, computed, h } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useAuthStore } from "@/store/auth";
+import { theme as antTheme } from "ant-design-vue";
 const { theme, isSidebarCollapsed } = storeToRefs(useSystemStore());
 const { setSidebarCollapsed, changeTheme, setLanguage } = useSystemStore();
-const message = useMessage();
 const router = useRouter();
 const route = useRoute();
 const { clearAuthData } = useAuthStore();
+
+const { token } = antTheme.useToken();
 
 interface IProps {}
 const {} = defineProps<IProps>();
@@ -114,17 +123,17 @@ const dropdownOptions = [
   {
     label: "用户资料",
     key: "profile",
-    icon: renderIcon(icons.EarOffIcon),
+    icon: () => h(CustomIcon, { name: "EarOffIcon" }),
   },
   {
     label: "编辑用户资料",
     key: "editProfile",
-    icon: renderIcon(icons.File),
+    icon: () => h(CustomIcon, { name: "File" }),
   },
   {
     label: "退出登录",
     key: "logout",
-    icon: renderIcon(icons.Globe2),
+    icon: () => h(CustomIcon, { name: "Globe2" }),
   },
 ];
 

@@ -22,9 +22,6 @@ import {
   LucideChevronDown,
   MonitorCog,
 } from "lucide-vue-next";
-import type { Component } from "vue";
-import { NIcon } from "naive-ui";
-import { h } from "vue";
 
 export const icons = {
   PanelLeftClose,
@@ -50,7 +47,3 @@ export const icons = {
   LucideChevronDown,
   MonitorCog,
 };
-
-export function renderIcon(icon: Component) {
-  return () => h(NIcon, null, { default: () => h(icon) });
-}
