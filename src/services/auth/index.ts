@@ -1,6 +1,5 @@
 import http from "@/tools/axios";
 import type {
-  UserInfo,
   LoginParams,
   LoginResponse,
   RegisterParams,
@@ -8,20 +7,12 @@ import type {
 } from "./type";
 
 /**
- * 获取当前登录用户的信息
- * @returns Promise<UserInfo>
- */
-export const getUserInfo = (): Promise<UserInfo> => {
-  return http.get<UserInfo>("/user/profile");
-};
-
-/**
  * 用户登录
  * @param data 登录凭证
- * @returns Promise<LoginResponse>
+ * @returns Promise<LoginResponse> 获取当前登录用户的信息
  */
 export const login = (data: LoginParams): Promise<LoginResponse> => {
-  return http.post<LoginResponse>("/auth/login", data);
+  return http.post<LoginResponse>("/admin/auth/login", data);
 };
 
 /**
@@ -30,5 +21,5 @@ export const login = (data: LoginParams): Promise<LoginResponse> => {
  * @returns Promise<RegisterResponse>
  */
 export const register = (data: RegisterParams): Promise<RegisterResponse> => {
-  return http.post<RegisterResponse>("/auth/register", data);
+  return http.post<RegisterResponse>("/admin/auth/register", data);
 };

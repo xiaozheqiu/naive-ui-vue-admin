@@ -12,8 +12,8 @@ export interface LoginParams {
 
 /** 登录响应数据 */
 export interface LoginResponse {
-  access_token: string;
-  userInfo: UserInfo;
+  accessToken: string;
+  userInfo: UserInfo | null;
 }
 
 /** 注册请求参数 */

@@ -29,18 +29,22 @@ const themeOverrides: GlobalThemeOverrides = {
     borderRadiusSmall: "4px",
     borderRadius: "8px",
     fontSize: "13px",
+    heightMedium: "28px",
   },
   Card: {
     paddingMedium: "12px",
     paddingLarge: "24px",
   },
   Menu: {
-    itemHeight: "30px",
+    itemHeight: "36px",
   },
   Dropdown: {
     optionHeightSmall: "28px",
     optionHeightMedium: "28px",
     optionHeightLarge: "28px",
+  },
+  Button: {
+    paddingMedium: "0 12px",
   },
 };
 </script>

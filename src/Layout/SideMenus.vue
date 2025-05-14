@@ -72,7 +72,7 @@ function mapRoutesToMenuOptions(
         : `/${route.path}`; // 为根级路径添加前导斜杠
 
     return {
-      label: route.name as string | undefined,
+      label: route?.meta?.title as string | undefined,
       key: fullPath,
       icon: route.meta?.icon ? renderIcon(route.meta.icon) : undefined,
       children: route.children

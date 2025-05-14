@@ -1,3 +1,4 @@
+import { useAuthStore } from "@/store/auth";
 import axios from "axios";
 import type {
   AxiosInstance,
@@ -8,6 +9,7 @@ import type {
   CancelTokenSource,
 } from "axios";
 import { createDiscreteApi } from "naive-ui";
+import { storeToRefs } from "pinia";
 import { stringify } from "qs"; // 用于序列化参数
 const { message: MessageApi } = createDiscreteApi(["message"]);
 
@@ -57,7 +59,8 @@ export class HttpService {
     // 请求拦截器
     this.instance.interceptors.request.use(
       (config: InternalAxiosRequestConfig) => {
-        const token = localStorage.getItem("token");
+        const { authData } = storeToRefs(useAuthStore());
+        const token = authData.value.accessToken;
         if (token && config.headers) {
           config.headers.Authorization = `Bearer ${token}`;
         }

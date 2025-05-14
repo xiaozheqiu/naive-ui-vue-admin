@@ -19,7 +19,7 @@
           <router-view
             :key="routeKey"
             v-slot="{ Component, route }"
-            class="h-full absolute inset-0 p-2"
+            class="h-full absolute inset-0 p-3"
           >
             <transition name="fade">
               <component :is="Component" :key="route.path" />

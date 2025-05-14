@@ -71,7 +71,7 @@
         v-if="theme !== 'dark'"
       ></custom-icon>
 
-      <n-dropdown :options="dropdownOptions">
+      <n-dropdown :options="dropdownOptions" @select="onDropdownSelect">
         <div class="flex items-center gap-2 group">
           <n-avatar
             round
@@ -95,13 +95,15 @@ import { storeToRefs } from "pinia";
 import { icons, renderIcon } from "../tools/icons";
 import { useSystemStore } from "../store/system";
 import { useMessage } from "naive-ui";
-import { onMounted, onUnmounted, ref, computed } from "vue"; // Import computed
-import { useRouter, useRoute, type RouteLocationMatched } from "vue-router"; // Import RouteLocationMatched
+import { onMounted, onUnmounted, ref, computed } from "vue";
+import { useRouter, useRoute } from "vue-router";
+import { useAuthStore } from "@/store/auth";
 const { theme, isSidebarCollapsed } = storeToRefs(useSystemStore());
 const { setSidebarCollapsed, changeTheme, setLanguage } = useSystemStore();
 const message = useMessage();
 const router = useRouter();
 const route = useRoute();
+const { clearAuthData } = useAuthStore();
 
 interface IProps {}
 const {} = defineProps<IProps>();
@@ -125,6 +127,13 @@ const dropdownOptions = [
     icon: renderIcon(icons.Globe2),
   },
 ];
+
+function onDropdownSelect(key: string) {
+  if (key === "logout") {
+    clearAuthData();
+    router.push("/login");
+  }
+}
 
 const languagesOptions = [
   {

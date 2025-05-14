@@ -7,7 +7,6 @@
 </template>
 
 <script setup lang="ts">
-
 import CustomConfigProvider from "./components/CustomConfigProvider.vue";
 </script>
 

@@ -2,6 +2,8 @@ import { createRouter, createWebHistory } from "vue-router";
 import { CommonRouter } from "./common";
 import { useTabsStore } from "../store/tabs";
 import NotFound from "@/views/NotFound.vue"; // 确保路径正确
+import { useAuthStore } from "@/store/auth";
+import { storeToRefs } from "pinia";
 
 // 定义路由规则
 const routes = [
@@ -45,8 +47,9 @@ router.beforeEach((to, from, next) => {
   console.log("路由已重新加载");
   console.log(`当前路由: ${to.fullPath}`);
   const tabsStore = useTabsStore();
+  const { authData } = storeToRefs(useAuthStore());
   if (to.meta.requiresAuth) {
-    const isAuthenticated = !!localStorage.getItem("token");
+    const isAuthenticated = !!authData.value.accessToken;
     if (!isAuthenticated) {
       next("/login");
     } else {

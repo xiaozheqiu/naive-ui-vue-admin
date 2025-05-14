@@ -25,6 +25,12 @@
             @keyup.enter="handleLogin"
           />
         </n-form-item>
+        
+        <div class="flex justify-between items-center mb-4">
+          <n-checkbox v-model:checked="rememberMe">记住我</n-checkbox>
+          <n-button text type="primary" @click="handleForgotPassword">忘记密码？</n-button>
+        </div>
+        
         <n-button
           type="primary"
           attr-type="submit"
@@ -34,6 +40,11 @@
         >
           登录
         </n-button>
+        
+        <div class="flex justify-center mt-4">
+          <span class="text-gray-500">还没有账号？</span>
+          <n-button text type="primary" class="ml-1" @click="handleRegister">立即注册</n-button>
+        </div>
       </n-form>
     </n-card>
   </div>
@@ -48,16 +59,20 @@ import {
   NFormItem,
   NInput,
   NButton,
+  NCheckbox,
   useMessage,
   type FormInst,
   type FormRules,
 } from "naive-ui";
 import { login } from "@/services/auth";
+import { useAuthStore } from "@/store/auth";
+const { updateAuthData } = useAuthStore();
 
 const router = useRouter();
 const message = useMessage();
 const formRef = ref<FormInst | null>(null);
 const loading = ref(false);
+const rememberMe = ref(false);
 
 const formValue = reactive({
   email: "",
@@ -84,22 +99,40 @@ const rules: FormRules = {
   ],
 };
 
+// 处理忘记密码点击事件
+const handleForgotPassword = () => {
+  message.info("忘记密码功能即将上线");
+  // 这里可以跳转到忘记密码页面
+  // router.push('/forgot-password');
+};
+
+// 处理注册按钮点击事件
+const handleRegister = () => {
+  router.push('/register');
+};
+
 const handleLogin = (e: Event) => {
   e.preventDefault();
-  formRef.value?.validate((errors) => {
+  formRef.value?.validate(async (errors) => {
     if (!errors) {
-      loading.value = true;
-      // 模拟登录请求
-      login(formValue)
-        .then((res) => {
-          console.log("登录成功", res);
-          localStorage.setItem("token", res.access_token); // 假设返回的 token
-          message.success("登录成功");
-          router.push("/"); // 跳转到概览或其他页面
-        })
-        .finally(() => {
-          loading.value = false;
-        });
+      try {
+        loading.value = true;
+        // 记住用户登录状态
+        if (rememberMe.value) {
+          localStorage.setItem('remember', 'true');
+        } else {
+          localStorage.removeItem('remember');
+        }
+        
+        // 模拟登录请求
+        const res = await login(formValue);
+        updateAuthData(res);
+        message.success("登录成功");
+        router.push("/");
+      } catch (error) {
+        console.log(error, "登录失败");
+      }
+      loading.value = false;
     } else {
       console.log(errors);
     }

@@ -60,4 +60,26 @@ export const CommonRouter: RouteRecordRaw[] = [
     component: () => import("../views/Reports.vue"),
     meta: { title: "Reports", icon: icons.Cable },
   },
+
+  {
+    path: "system",
+    name: "System",
+    // 添加重定向到第一个子路由
+    redirect: "/system/menus",
+    meta: {
+      title: "系统设置",
+      icon: icons.MonitorCog,
+    },
+    children: [
+      {
+        path: "menus",
+        name: "Menus",
+        component: () => import("../views/admin/Menus.vue"),
+        meta: {
+          title: "菜单管理",
+          icon: icons.Menu,
+        },
+      },
+    ],
+  },
 ];

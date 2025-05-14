@@ -18,6 +18,9 @@ import {
   Menu,
   Shrink,
   House,
+  LucideChevronUp,
+  LucideChevronDown,
+  MonitorCog,
 } from "lucide-vue-next";
 import type { Component } from "vue";
 import { NIcon } from "naive-ui";
@@ -43,6 +46,9 @@ export const icons = {
   Menu,
   Shrink,
   House,
+  LucideChevronUp,
+  LucideChevronDown,
+  MonitorCog,
 };
 
 export function renderIcon(icon: Component) {

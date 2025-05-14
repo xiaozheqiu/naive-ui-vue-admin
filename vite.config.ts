@@ -10,6 +10,12 @@ export default defineConfig({
   resolve: {
     alias: { "@": path.resolve(__dirname, "./src") },
   },
+  server: {
+    host: "0.0.0.0",
+    port: 8000,
+    strictPort: true,
+    open:true
+  },
   plugins: [
     vue(),
     AutoImport({
