@@ -3,7 +3,7 @@
     :collapsed-width="64"
     :width="200"
     :trigger="null"
-    class="h-full flex flex-col max-h-full"
+    :class="`h-full flex flex-col max-h-full ${theme === 'dark' ? '!bg-[#141414]' : ''}`"
     :collapsed="isSidebarCollapsed"
     @collapse="(val: boolean) => setSidebarCollapsed(val)"
     :theme="theme"
@@ -19,9 +19,8 @@
     </div>
     <Menu
       :items="sideMenusOptions"
-      class="flex-grow !px-2"
+      class="`flex-grow !px-2 ${theme === 'dark' ? '!bg-[#141414]' : ''}` flex-grow"
       @select="(item) => onMenuChange(item.key as string)"
-      :theme="theme"
       mode="inline"
       v-model:selectedKeys="currentKey"
       :inlineIndent="16"

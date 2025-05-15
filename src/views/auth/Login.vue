@@ -11,7 +11,6 @@
           :rules="rules"
           @finish="handleLogin"
           layout="vertical"
-          size="middle"
           class="w-full"
         >
           <a-form-item name="email" label="邮箱" class="">

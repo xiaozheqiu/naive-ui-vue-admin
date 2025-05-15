@@ -1,8 +1,8 @@
 <template>
   <ConfigProvider
-    componentSize="small"
+    componentSize="middle"
     :theme="{
-      token: themeConfig,
+      token: {},
       algorithm:
         theme === 'dark' ? antTheme.darkAlgorithm : antTheme.defaultAlgorithm,
     }"
