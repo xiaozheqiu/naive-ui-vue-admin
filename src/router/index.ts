@@ -7,16 +7,16 @@ import { storeToRefs } from "pinia";
 
 // 定义路由规则
 const routes = [
-  // {
-  //   path: "/login",
-  //   name: "Login",
-  //   component: () => import("../views/Login.vue"),
-  // },
-  // {
-  //   path: "/register",
-  //   name: "Register",
-  //   component: () => import("../views/Register.vue"),
-  // },
+  {
+    path: "/login",
+    name: "Login",
+    component: () => import("../views/auth/Login.vue"),
+  },
+  {
+    path: "/register",
+    name: "Register",
+    component: () => import("../views/auth/Register.vue"),
+  },
   {
     path: "/",
     component: () => import("../Layout/index.vue"),
@@ -25,15 +25,15 @@ const routes = [
     children: CommonRouter,
   },
 
-  // {
-  //   path: "/:pathMatch(.*)*",
-  //   name: "NotFound",
-  //   component: NotFound,
-  //   meta: {
-  //     title: "页面未找到",
-  //     hideInMenu: true, // 通常不在菜单中显示 404
-  //   },
-  // },
+  {
+    path: "/:pathMatch(.*)*",
+    name: "NotFound",
+    component: NotFound,
+    meta: {
+      title: "页面未找到",
+      hideInMenu: true, // 通常不在菜单中显示 404
+    },
+  },
 ];
 
 // 创建路由实例
@@ -45,21 +45,21 @@ const router = createRouter({
 // 路由守卫
 router.beforeEach((to, from, next) => {
   next();
-  // console.log("路由已重新加载");
-  // console.log(`当前路由: ${to.fullPath}`);
-  // const tabsStore = useTabsStore();
-  // const { authData } = storeToRefs(useAuthStore());
-  // if (to.meta.requiresAuth) {
-  //   const isAuthenticated = !!authData.value.accessToken;
-  //   if (!isAuthenticated) {
-  //     next("/login");
-  //   } else {
-  //     tabsStore.addTab(to);
-  //     next();
-  //   }
-  // } else {
-  //   next();
-  // }
+  console.log("路由已重新加载");
+  console.log(`当前路由: ${to.fullPath}`);
+  const tabsStore = useTabsStore();
+  const { authData } = storeToRefs(useAuthStore());
+  if (to.meta.requiresAuth) {
+    const isAuthenticated = !!authData.value.accessToken;
+    if (!isAuthenticated) {
+      next("/login");
+    } else {
+      tabsStore.addTab(to);
+      next();
+    }
+  } else {
+    next();
+  }
 });
 
 export default router;

@@ -8,7 +8,7 @@ import type {
   InternalAxiosRequestConfig,
   CancelTokenSource,
 } from "axios";
-import { message } from "ant-design-vue";
+import { message as messageApi } from "ant-design-vue";
 import { storeToRefs } from "pinia";
 import { stringify } from "qs"; // 用于序列化参数
 
@@ -136,7 +136,7 @@ export class HttpService {
           errorMessage = `请求配置错误 ${message}`;
         }
 
-        message.error(`Error ${status}: ${errorMessage}`);
+        messageApi.error(`Error ${status}: ${errorMessage}`);
         return Promise.reject({
           status,
           message: errorMessage,

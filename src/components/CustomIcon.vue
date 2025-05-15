@@ -2,7 +2,7 @@
   <a-button
     v-if="!props.isOnlyIcon"
     type="text"
-    class="!w-[30px] !h-[30px] !leading-[0] !p-0 flex items-center justify-center"
+    :class="`!w-[30px] !h-[30px] !leading-[0] !p-0 flex items-center justify-center ${props.class}`"
   >
     <template #icon>
       <component
@@ -12,7 +12,7 @@
         :stroke-width="props.strokeWidth || 1.5"
         :absolute-stroke-width="props.absoluteStrokeWidth || false"
         class="inline"
-        :class="props.class"
+      
       />
     </template>
     <slot />

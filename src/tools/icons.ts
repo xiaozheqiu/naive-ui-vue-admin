@@ -21,6 +21,7 @@ import {
   LucideChevronUp,
   LucideChevronDown,
   MonitorCog,
+  ChartPie
 } from "lucide-vue-next";
 
 export const icons = {
@@ -46,4 +47,5 @@ export const icons = {
   LucideChevronUp,
   LucideChevronDown,
   MonitorCog,
+  ChartPie
 };

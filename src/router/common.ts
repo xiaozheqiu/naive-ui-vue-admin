@@ -5,52 +5,21 @@ import type { RouteRecordRaw } from "vue-router";
 
 export const CommonRouter: RouteRecordRaw[] = [
   {
-    path: "overview",
-    name: "Overview",
-    // 添加重定向到第一个子路由
-    redirect: "/overview/sub-overview",
-    meta: {
-      title: "Overview",
-      icon: "PanelLeftOpen",
-    },
-    children: [
-      {
-        path: "sub-overview",
-        name: "SubOverview",
-        component: () => import("../views/SubOverview.vue"),
-        meta: {
-          title: "Sub Overview",
-          icon: "DamIcon",
-        },
-      },
-      {
-        path: "new-sub-overview",
-        name: "NewSubOverview",
-        meta: {
-          title: "New Sub Overview",
-          icon: "EarOffIcon",
-        },
-        children: [
-          {
-            path: "detail",
-            name: "NewSubOverviewDetail",
-            component: () => import("../views/Family.vue"),
-            meta: {
-              title: "New Sub Overview Detail",
-              icon: "File",
-            },
-          },
-        ],
-      },
-    ],
-  },
-  {
     path: "settings",
     name: "Settings",
     component: () => import("../views/Settings.vue"),
     meta: {
       title: "Settings",
       icon: "Bell",
+    },
+  },
+  {
+    path: "overview",
+    name: "Overview",
+    component: () => import("../views/Overview.vue"),
+    meta: {
+      title: "概览",
+      icon: "ChartPie",
     },
   },
 

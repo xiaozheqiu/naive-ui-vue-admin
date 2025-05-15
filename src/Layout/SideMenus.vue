@@ -1,7 +1,7 @@
 <template>
-  <a-layout-sider
+  <LayoutSider
     :collapsed-width="64"
-    :width="240"
+    :width="200"
     :trigger="null"
     class="h-full flex flex-col max-h-full"
     :collapsed="isSidebarCollapsed"
@@ -17,38 +17,52 @@
         My Application
       </div>
     </div>
-    <a-menu
+    <Menu
       :items="sideMenusOptions"
-      class="flex-grow"
-      @select="onMenuChange"
+      class="flex-grow !px-2"
+      @select="(item) => onMenuChange(item.key as string)"
       :theme="theme"
       mode="inline"
+      v-model:selectedKeys="currentKey"
+      :inlineIndent="16"
     />
-  </a-layout-sider>
+  </LayoutSider>
 </template>
 
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
-import { ref, h } from "vue";
+import { ref, h, watch, onMounted } from "vue";
 import { useRouter, type RouteRecordRaw } from "vue-router";
 import { CommonRouter } from "../router/common";
+import { Menu, LayoutSider } from "ant-design-vue";
 import { useSystemStore } from "../store/system";
 import CustomIcon from "@/components/CustomIcon.vue";
 const { theme } = storeToRefs(useSystemStore());
 
 const router = useRouter();
-const currentKey = ref(router.currentRoute.value.path);
+const currentKey = ref<string[]>([router.currentRoute.value.path]);
 
 const { isSidebarCollapsed } = storeToRefs(useSystemStore());
 const { setSidebarCollapsed } = useSystemStore();
 
-function onMenuChange(item: { key: string }) {
-  console.log(item, "onMenuChange");
-  currentKey.value = item.key;
-  router.push(item.key);
+function onMenuChange(key: string) {
+  console.log(key, "onMenuChange");
+  currentKey.value = [key];
+  router.push(key);
 }
 
-console.log(currentKey.value, "currentKey.value");
+// 监听路由变化，更新菜单选中状态
+watch(
+  () => router.currentRoute.value,
+  (route) => {
+    currentKey.value = [route.path];
+  },
+);
+
+// 组件挂载时，确保菜单选中状态与当前路由同步
+onMounted(() => {
+  currentKey.value = [router.currentRoute.value.path];
+});
 
 function mapRoutesToMenuOptions(
   routes: RouteRecordRaw[],
@@ -56,7 +70,7 @@ function mapRoutesToMenuOptions(
 ): Array<{
   label: string | undefined;
   key: string;
-  icon?: ReturnType<typeof any>;
+  icon?: any;
   children?: any;
 }> {
   return routes.map((route) => {
@@ -71,7 +85,11 @@ function mapRoutesToMenuOptions(
       label: route?.meta?.title as string | undefined,
       key: fullPath,
       icon: route.meta?.icon
-        ? () => h(CustomIcon, { name: route?.meta?.icon, isOnlyIcon: true })
+        ? () =>
+            h(CustomIcon, {
+              name: route?.meta?.icon as string,
+              isOnlyIcon: true,
+            })
         : undefined,
       children: route.children
         ? mapRoutesToMenuOptions(route.children, fullPath)

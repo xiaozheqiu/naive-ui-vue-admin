@@ -2,3 +2,9 @@
 .css-dev-only-do-not-override-f1wsx1.ant-btn > span + .anticon {
   margin-left: 0px;
 }
+
+
+.ant-btn{
+  display: flex !important;
+  align-items: center !important;
+}
