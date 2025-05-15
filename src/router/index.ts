@@ -44,7 +44,6 @@ const router = createRouter({
 
 // 路由守卫
 router.beforeEach((to, from, next) => {
-  next();
   console.log("路由已重新加载");
   console.log(`当前路由: ${to.fullPath}`);
   const tabsStore = useTabsStore();

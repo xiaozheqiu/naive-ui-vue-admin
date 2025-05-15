@@ -1,5 +1,5 @@
 <template>
-  <div >
+  <div class="flex flex-col gap-4">
     <!-- 使用FilterCard组件 -->
     <FilterCard
       :formValue="filterForm"
@@ -10,19 +10,17 @@
     />
 
     <!-- 显示筛选结果 -->
-    <div class="mt-4 bg-white p-4 rounded-lg shadow-sm">
+    <Card class="p-4 rounded-lg shadow-sm">
       <h2 class="text-lg font-medium mb-2">筛选结果</h2>
-      <pre class="bg-gray-50 p-2 rounded">{{
-        JSON.stringify(searchParams, null, 2)
-      }}</pre>
-    </div>
+      <pre class="p-2 rounded">{{ JSON.stringify(searchParams, null, 2) }}</pre>
+    </Card>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive } from "vue";
 import FilterCard, { type FilterItemConfig } from "@/components/FilterCard.vue";
-import { Input, Select, DatePicker, TimePicker } from "ant-design-vue";
+import { Input, Select, DatePicker, TimePicker, Card } from "ant-design-vue";
 
 // 定义筛选表单数据
 const filterForm = reactive({

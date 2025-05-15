@@ -1,61 +1,57 @@
 <template>
-  <div class="bg-white rounded-lg shadow-sm mb-4">
-    <div class="p-4">
-      <Form ref="formRef" :model="props.formValue" layout="horizontal">
-        <Row :gutter="[16, 12]">
-          <template v-for="config in itemsToDisplay" :key="config.path">
-            <Col :span="props.colSpan">
-              <FormItem
-                :label="config.label"
-                :name="config.path"
-                v-bind="config.formItemProps || {}"
-                class="!mb-0"
-              >
-                <component
-                  :is="config.control.component"
-                  v-model:value="props.formValue[config.path]"
-                  v-bind="config.control.props || {}"
-                  class="w-full rounded-md"
-                />
-              </FormItem>
-            </Col>
-          </template>
-
+  <Card>
+    <Form ref="formRef" :model="props.formValue" layout="horizontal">
+      <Row :gutter="[16, 12]">
+        <template v-for="config in itemsToDisplay" :key="config.path">
           <Col :span="props.colSpan">
-            <Space class="flex items-center">
-              <Button type="primary" @click="handleSearch">
-                <template #icon><SearchOutlined /></template>
-                搜索
-              </Button>
-              <Button @click="handleResetClick">
-                <template #icon><ReloadOutlined /></template>
-                重置
-              </Button>
-              <div
-                @click="toggleFilters"
-                v-if="props.itemConfigs.length > props.defaultVisibleItemsCount"
-                class="flex items-center cursor-pointer justify-center gap-0.5 hover:text-blue-500"
-              >
-                {{ showAllFilters ? "收起" : "展开" }}
-                <CustomIcon
-                  :name="
-                    showAllFilters ? 'LucideChevronUp' : 'LucideChevronDown'
-                  "
-                  :size="16"
-                  is-only-icon
-                />
-              </div>
-            </Space>
+            <FormItem
+              :label="config.label"
+              :name="config.path"
+              v-bind="config.formItemProps || {}"
+              class="!mb-0"
+            >
+              <component
+                :is="config.control.component"
+                v-model:value="props.formValue[config.path]"
+                v-bind="config.control.props || {}"
+                class="w-full rounded-md"
+              />
+            </FormItem>
           </Col>
-        </Row>
-      </Form>
-    </div>
-  </div>
+        </template>
+
+        <Col :span="props.colSpan">
+          <Space class="flex items-center">
+            <Button type="primary" @click="handleSearch">
+              <template #icon><SearchOutlined /></template>
+              搜索
+            </Button>
+            <Button @click="handleResetClick">
+              <template #icon><ReloadOutlined /></template>
+              重置
+            </Button>
+            <div
+              @click="toggleFilters"
+              v-if="props.itemConfigs.length > props.defaultVisibleItemsCount"
+              class="flex items-center cursor-pointer justify-center gap-0.5 hover:text-blue-500"
+            >
+              {{ showAllFilters ? "收起" : "展开" }}
+              <CustomIcon
+                :name="showAllFilters ? 'LucideChevronUp' : 'LucideChevronDown'"
+                :size="16"
+                is-only-icon
+              />
+            </div>
+          </Space>
+        </Col>
+      </Row>
+    </Form>
+  </Card>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import { Button, Form, FormItem, Row, Col, Space } from "ant-design-vue";
+import { Button, Form, FormItem, Row, Col, Space, Card } from "ant-design-vue";
 import type { FormInstance, FormItemProps } from "ant-design-vue";
 import { SearchOutlined, ReloadOutlined } from "@ant-design/icons-vue";
 import CustomIcon from "@/components/CustomIcon.vue";

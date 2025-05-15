@@ -30,6 +30,7 @@ import { themeConfig } from "@/config/theme";
 const { theme } = storeToRefs(useSystemStore());
 
 const { token } = antTheme.useToken();
+console.log(theme, "theme");
 
 console.log(token.value, "token");
 
