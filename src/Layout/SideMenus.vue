@@ -4,7 +4,6 @@
     :width="240"
     :trigger="null"
     class="h-full flex flex-col max-h-full"
-    collapsible="true"
     :collapsed="isSidebarCollapsed"
     @collapse="(val: boolean) => setSidebarCollapsed(val)"
     :theme="theme"
@@ -21,9 +20,9 @@
     <a-menu
       :items="sideMenusOptions"
       class="flex-grow"
-      :value="currentKey"
-      @update:value="onMenuChange"
+      @select="onMenuChange"
       :theme="theme"
+      mode="inline"
     />
   </a-layout-sider>
 </template>
@@ -36,20 +35,20 @@ import { CommonRouter } from "../router/common";
 import { useSystemStore } from "../store/system";
 import CustomIcon from "@/components/CustomIcon.vue";
 const { theme } = storeToRefs(useSystemStore());
-import { theme as antTheme } from "ant-design-vue";
 
 const router = useRouter();
 const currentKey = ref(router.currentRoute.value.path);
 
 const { isSidebarCollapsed } = storeToRefs(useSystemStore());
 const { setSidebarCollapsed } = useSystemStore();
-const { token } = antTheme.useToken();
 
-function onMenuChange(key: string, item: MenuOption) {
-  console.log(key, item, "onMenuChange", currentKey.value);
-  currentKey.value = key;
-  router.push(key);
+function onMenuChange(item: { key: string }) {
+  console.log(item, "onMenuChange");
+  currentKey.value = item.key;
+  router.push(item.key);
 }
+
+console.log(currentKey.value, "currentKey.value");
 
 function mapRoutesToMenuOptions(
   routes: RouteRecordRaw[],

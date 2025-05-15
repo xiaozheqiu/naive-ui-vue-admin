@@ -1,2 +1,4 @@
-.test_custom {
+.css-dev-only-do-not-override-f1wsx1.ant-btn > .anticon + span,
+.css-dev-only-do-not-override-f1wsx1.ant-btn > span + .anticon {
+  margin-left: 0px;
 }

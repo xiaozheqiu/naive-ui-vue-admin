@@ -1,68 +1,86 @@
 <template>
-  <n-card :bordered="false">
-    <div class="filter-content-wrapper">
-      <n-form ref="formRef" :model="props.formValue" label-placement="left">
-        <n-grid
-          :x-gap="16"
-          :y-gap="12"
-          :cols="props.gridCols"
-          responsive="screen"
-        >
-          <template v-for="config in itemsToDisplay" :key="config.path">
-            <n-gi v-bind="config.giProps || {}">
-              <n-form-item
-                :label="config.label"
-                :path="config.path"
-                v-bind="config.formItemProps || {}"
-                :show-feedback="false"
-              >
-                <component
-                  :is="config.control.component"
-                  v-model:value="props.formValue[config.path]"
-                  v-bind="config.control.props || {}"
-                />
-              </n-form-item>
-            </n-gi>
-          </template>
+  <div class="flex flex-col gap-4 p-4">
+    <a-form ref="formRef" :model="props.formValue" layout="horizontal">
+      <a-row :gutter="[16, 12]">
+        <template v-for="config in itemsToDisplay" :key="config.path">
+          <a-col v-bind="config.colProps || getDefaultColProps()">
+            <a-form-item
+              :label="config.label"
+              :name="config.path"
+              v-bind="config.formItemProps || {}"
+              :validate-status="undefined"
+              :help="undefined"
+              class="tailwind-form-item"
+            >
+              <component
+                :is="config.control.component"
+                v-model:value="props.formValue[config.path]"
+                v-bind="config.control.props || {}"
+                class="rounded-md"
+              />
+            </a-form-item>
+          </a-col>
+        </template>
 
-          <n-gi :span="props.actionGiSpan">
-            <n-space justify="start" item style="width: 100%">
-              <n-button type="primary" @click="handleSearch">搜索</n-button>
-              <n-button @click="handleResetClick">重置</n-button>
-              <div
-                @click="toggleFilters"
-                v-if="props.itemConfigs.length > props.defaultVisibleItemsCount"
-                class="flex items-center cursor-pointer text-blue-500 justify-center h-full"
-              >
-                <CustomIcon name="LucideChevronUp" v-if="showAllFilters" />
-                <CustomIcon name="LucideChevronDown" v-else />
-                {{ showAllFilters ? "收起" : "展开" }}
-              </div>
-            </n-space>
-          </n-gi>
-        </n-grid>
-      </n-form>
-    </div>
-  </n-card>
+        <a-col :span="props.actionColSpan || 6">
+          <a-space class="flex items-center h-full mt-1">
+            <a-button
+              type="primary"
+              @click="handleSearch"
+              class="inline-flex items-center rounded-md"
+            >
+              <template #icon><SearchOutlined /></template>
+              搜索
+            </a-button>
+            <a-button
+              @click="handleResetClick"
+              class="inline-flex items-center rounded-md"
+            >
+              <template #icon><ReloadOutlined /></template>
+              重置
+            </a-button>
+            <a-button
+              type="link"
+              @click="toggleFilters"
+              v-if="props.itemConfigs.length > props.defaultVisibleItemsCount"
+              class="inline-flex items-center p-1"
+            >
+              <template #icon>
+                <UpOutlined v-if="showAllFilters" />
+                <DownOutlined v-else />
+              </template>
+              {{ showAllFilters ? "收起" : "展开" }}
+            </a-button>
+          </a-space>
+        </a-col>
+      </a-row>
+    </a-form>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, defineEmits, defineProps, type Component } from "vue";
 import {
-  NButton,
-  NCard,
-  NForm,
-  NFormItem,
-  NGrid,
-  NGi,
-  NSpace,
-  type FormInst,
-  type FormItemProps as NFormItemProps, // Renaming to avoid conflict if needed
-} from "naive-ui";
+  Button as AButton,
+  Card as ACard,
+  Form as AForm,
+  FormItem as AFormItem,
+  Row as ARow,
+  Col as ACol,
+  Space as ASpace,
+  Input as AInput,
+} from "ant-design-vue";
+import type { FormInstance, FormItemProps } from "ant-design-vue";
+import {
+  SearchOutlined,
+  ReloadOutlined,
+  UpOutlined,
+  DownOutlined,
+} from "@ant-design/icons-vue";
 import CustomIcon from "@/components/CustomIcon.vue";
 
 interface FormItemControlConfig {
-  component: string | Component; // e.g., 'NInput', 'NSelect', or imported component object
+  component: string | Component; // e.g., 'AInput', 'ASelect', or imported component object
   props?: Record<string, any>; // Props for the control itself
 }
 
@@ -70,8 +88,8 @@ export interface FilterItemConfig {
   // Exporting for use in parent component
   path: string; // Used for formValue key and n-form-item path
   label: string;
-  giProps?: Record<string, any>; // Props for n-gi, e.g., { span: 1 }
-  formItemProps?: Omit<NFormItemProps, "label" | "path">; // Additional props for n-form-item
+  colProps?: Record<string, any>; // Props for a-col, e.g., { span: 6 }
+  formItemProps?: Omit<FormItemProps, "label" | "name">; // Additional props for a-form-item
   control: FormItemControlConfig;
   defaultValue?: any; // Optional: To help parent initialize formValue
 }
@@ -94,22 +112,37 @@ const props = defineProps({
     type: Number,
     default: 2,
   },
-  gridCols: {
-    type: String,
-    default: "1 s:2 m:4", // Default grid column setup
+  // 将原来的 gridCols 改为更符合 antd 的属性
+  responsiveCol: {
+    type: Boolean,
+    default: true,
   },
-  actionGiSpan: {
+  actionColSpan: {
     // Span for the action buttons grid item
     type: Number,
-    default: 1,
+    default: 6,
   },
 });
 
 // Define emits
 const emit = defineEmits(["search", "reset"]);
 
-const formRef = ref<FormInst | null>(null);
-const showAllFilters = ref(false); // Changed from false to true
+const formRef = ref<FormInstance>();
+const showAllFilters = ref(false);
+
+// 根据是否响应式来获取默认的列配置
+const getDefaultColProps = () => {
+  if (props.responsiveCol) {
+    return {
+      xs: 24,
+      sm: 12,
+      md: 8,
+      lg: 6,
+      xl: 6,
+    };
+  }
+  return { span: 6 };
+};
 
 const itemsToDisplay = computed(() => {
   if (
@@ -137,5 +170,35 @@ const handleResetClick = () => {
 </script>
 
 <style scoped>
-/* Add any specific styles for this component if needed */
+/* 只保留必要的组件特定样式覆盖 */
+:deep(.ant-form-item) {
+  margin-bottom: 0;
+}
+
+:deep(.ant-form-item-label) {
+  padding-bottom: 0;
+}
+
+:deep(.ant-form-item-control-input) {
+  min-height: 32px;
+}
+
+:deep(.ant-btn .anticon) {
+  margin-right: 4px;
+}
+
+/* 覆盖卡片内边距 */
+:deep(.ant-card-body) {
+  padding: 0;
+}
+
+/* 圆角选择器 */
+:deep(.ant-select-selector) {
+  border-radius: 0.375rem;
+}
+
+/* 自定义表单标签样式 */
+:deep(.tailwind-form-item .ant-form-item-label > label) {
+  color: #374151;
+}
 </style>

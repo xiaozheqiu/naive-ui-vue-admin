@@ -11,7 +11,7 @@
         :color="props.color"
         :stroke-width="props.strokeWidth || 1.5"
         :absolute-stroke-width="props.absoluteStrokeWidth || false"
-        class="inline-block"
+        class="inline"
         :class="props.class"
       />
     </template>
@@ -25,7 +25,7 @@
     :color="props.color"
     :stroke-width="props.strokeWidth || 1.5"
     :absolute-stroke-width="props.absoluteStrokeWidth || false"
-    class="inline-block"
+    class="inline"
     :class="props.class"
   />
 </template>

@@ -8,11 +8,8 @@
         <!-- 渲染路由标签记录 -->
         <!-- <router-tag-history /> -->
 
-        <a-layout-content class="m-[16px]">
-          <div
-            :style="{ background: token.colorBgContainer }"
-            class="relative overflow-hidden p-[16px] m-h-[360px]"
-          >
+        <a-layout-content>
+          <div class="relative overflow-hidden p-[16px] m-h-[360px]">
             <!-- 渲染子路由 -->
             <router-view
               :key="routeKey"
@@ -37,12 +34,8 @@
 <script setup lang="ts">
 import CustomHeader from "./CustomHeader.vue";
 import SideMenus from "./SideMenus.vue";
-import RouterTagHistory from "./RouterTagHistory.vue";
 import { ref, watch } from "vue";
 import { useRoute } from "vue-router";
-import { theme as antTheme } from "ant-design-vue";
-const { token } = antTheme.useToken();
-
 const route = useRoute();
 const routeKey = ref(route.fullPath);
 

@@ -1,5 +1,6 @@
 <template>
   <ConfigProvider
+    componentSize="small"
     :theme="{
       token: themeConfig,
       algorithm:
