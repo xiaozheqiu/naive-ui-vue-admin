@@ -201,6 +201,14 @@ export class HttpService {
     return this.instance.delete(url, config);
   }
 
+  public async patch<T>(
+    url: string,
+    data?: any,
+    config?: RequestConfig,
+  ): Promise<T> {
+    return this.instance.patch(url, data, config);
+  }
+
   // 文件上传
   public async uploadFile<T>(
     url: string,

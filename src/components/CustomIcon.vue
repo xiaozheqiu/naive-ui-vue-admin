@@ -6,13 +6,13 @@
   >
     <template #icon>
       <component
-        :is="icons[props.name as keyof typeof icons]"
+        :is="icons[props.name]"
+        v-bind="props"
         :size="props.size || 18"
         :color="props.color"
         :stroke-width="props.strokeWidth || 1.5"
         :absolute-stroke-width="props.absoluteStrokeWidth || false"
         class="inline"
-      
       />
     </template>
     <slot />
@@ -20,7 +20,7 @@
 
   <component
     v-else
-    :is="icons[props.name as keyof typeof icons]"
+    :is="icons[props.name]"
     :size="props.size || 18"
     :color="props.color"
     :stroke-width="props.strokeWidth || 1.5"
@@ -32,7 +32,8 @@
 
 <script setup lang="ts">
 import { defineProps } from "vue";
-import { icons } from "@/tools/icons";
+import * as LucideIcons from "lucide-vue-next";
+const icons = LucideIcons;
 
 interface Props {
   name: string;

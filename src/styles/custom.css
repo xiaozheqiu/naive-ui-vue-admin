@@ -3,8 +3,16 @@
   margin-left: 0px;
 }
 
-
-.ant-btn{
-  display: flex !important;
+.ant-btn {
+  display: inline-flex !important;
   align-items: center !important;
+  padding: 2px 8px !important;
+  gap: 4px !important;
+}
+.ant-btn > span {
+  margin: 0px !important;
+}
+
+.ant-card-body {
+  padding: 16px !important;
 }

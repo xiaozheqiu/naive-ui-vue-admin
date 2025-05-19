@@ -1,125 +1,84 @@
-<template>
-  <div class="flex flex-col gap-4">
-    <!-- 使用FilterCard组件 -->
-    <FilterCard
-      :formValue="filterForm"
-      :itemConfigs="filterConfig"
-      :defaultVisibleItemsCount="2"
-      @search="handleSearch"
-      @reset="handleReset"
-    />
-
-    <!-- 显示筛选结果 -->
-    <Card class="p-4 rounded-lg shadow-sm">
-      <h2 class="text-lg font-medium mb-2">筛选结果</h2>
-      <pre class="p-2 rounded">{{ JSON.stringify(searchParams, null, 2) }}</pre>
-    </Card>
-  </div>
-</template>
-
 <script setup lang="ts">
-import { ref, reactive } from "vue";
-import FilterCard, { type FilterItemConfig } from "@/components/FilterCard.vue";
-import { Input, Select, DatePicker, TimePicker, Card } from "ant-design-vue";
+import { ref, computed } from "vue";
+import VirtualList from "vue3-virtual-scroll-list";
+import IconRow from "../IconRow.vue";
+import * as LucideIconsImport from "lucide-vue-next";
+const LucideIcons = LucideIconsImport as Record<string, any>;
 
-// 定义筛选表单数据
-const filterForm = reactive({
-  keyword: "",
-  status: undefined,
-  category: undefined,
-  dateRange: [],
-  createTime: null,
+// 获取所有图标名称
+const iconNames = Object.keys(LucideIcons);
+
+const selectedIcon = ref("");
+const search = ref("");
+
+// 过滤图标
+const filteredIcons = computed(() =>
+  search.value
+    ? iconNames.filter((name) =>
+        name.toLowerCase().includes(search.value.toLowerCase()),
+      )
+    : iconNames,
+);
+
+// 每行显示几个图标
+const iconsPerRow = 5;
+
+// 将图标数组按每组 iconsPerRow 个进行分组
+const groupedIcons = computed(() => {
+  const result = [];
+  const list = filteredIcons.value;
+  for (let i = 0; i < list.length; i += iconsPerRow) {
+    result.push(list.slice(i, i + iconsPerRow));
+  }
+  return result;
 });
 
-// 定义搜索参数(用于展示搜索结果)
-const searchParams = ref({});
-
-// 定义筛选配置
-const filterConfig: FilterItemConfig[] = [
-  {
-    path: "keyword",
-    label: "关键词",
-    control: {
-      component: Input,
-      props: {
-        placeholder: "请输入关键词",
-        allowClear: true,
-      },
-    },
-  },
-  {
-    path: "status",
-    label: "状态",
-    control: {
-      component: Select,
-      props: {
-        placeholder: "请选择状态",
-        allowClear: true,
-        options: [
-          { value: 1, label: "已启用" },
-          { value: 0, label: "已禁用" },
-        ],
-      },
-    },
-  },
-  {
-    path: "category",
-    label: "分类",
-    control: {
-      component: Select,
-      props: {
-        placeholder: "请选择分类",
-        allowClear: true,
-        options: [
-          { value: "tech", label: "科技" },
-          { value: "finance", label: "金融" },
-          { value: "education", label: "教育" },
-          { value: "health", label: "健康" },
-        ],
-      },
-    },
-  },
-  {
-    path: "dateRange",
-    label: "日期范围",
-    control: {
-      component: DatePicker.RangePicker,
-      props: {
-        placeholder: ["开始日期", "结束日期"],
-        style: { width: "100%" },
-      },
-    },
-  },
-  {
-    path: "createTime",
-    label: "创建时间",
-    control: {
-      component: TimePicker,
-      props: {
-        placeholder: "请选择时间",
-        format: "HH:mm",
-        style: { width: "100%" },
-      },
-    },
-  },
-];
-
-// 处理搜索事件
-const handleSearch = (values: any) => {
-  console.log("搜索参数:", values);
-  searchParams.value = values;
-  // 这里可以调用API进行实际搜索
-};
-
-// 处理重置事件
-const handleReset = () => {
-  // 重置表单数据
-  Object.keys(filterForm).forEach((key) => {
-    filterForm[key] = Array.isArray(filterForm[key]) ? [] : undefined;
-  });
-  filterForm.keyword = "";
-
-  searchParams.value = {};
-  console.log("表单已重置");
-};
+function handleSelect(iconName: string) {
+  if (iconNames.includes(iconName)) {
+    selectedIcon.value = iconName;
+  }
+}
 </script>
+
+<template>
+  <div class="flex items-center gap-2">
+    <span>图标：</span>
+    <a-popover title="选择图标" placement="bottom" trigger="click">
+      <template #content>
+        <div class="max-w-[480px] max-h-[260px] flex flex-col">
+          <input
+            v-model="search"
+            placeholder="搜索图标"
+            class="mb-2 px-2 py-1 border rounded text-sm"
+            style="width: 100%"
+          />
+          <VirtualList
+            :data-key="(item) => item.join('-')"
+            :data-sources="groupedIcons"
+            :data-component="IconRow"
+            :keeps="12"
+            :size="64"
+            :horizontal="true"
+            class="overflow-x-auto"
+            :extra-props="{
+              onSelect: handleSelect,
+            }"
+          />
+        </div>
+      </template>
+      <a-button size="small" type="primary" ghost>
+        <template #icon>
+          <component
+            v-if="LucideIcons[selectedIcon]"
+            :is="LucideIcons[selectedIcon]"
+            style="width: 18px; height: 18px"
+          />
+        </template>
+        {{ selectedIcon || "选择图标" }}
+      </a-button>
+    </a-popover>
+    <span v-if="selectedIcon" class="ml-2 text-gray-500 text-xs">{{
+      selectedIcon
+    }}</span>
+  </div>
+</template>

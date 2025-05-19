@@ -36,7 +36,7 @@ export const CommonRouter: RouteRecordRaw[] = [
       {
         path: "menus",
         name: "Menus",
-        component: () => import("../views/admin/Menus.vue"),
+        component: () => import("../views/admin/Menus.tsx"),
         meta: {
           title: "菜单管理",
           icon: "Menu",
