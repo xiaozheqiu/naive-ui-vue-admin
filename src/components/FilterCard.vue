@@ -1,116 +1,103 @@
 <template>
-  <n-card :bordered="false">
-    <div class="filter-content-wrapper">
-      <n-form ref="formRef" :model="props.formValue" label-placement="left">
-        <n-grid
-          :x-gap="16"
-          :y-gap="12"
-          :cols="props.gridCols"
-          responsive="screen"
-        >
-          <template v-for="config in itemsToDisplay" :key="config.path">
-            <n-gi v-bind="config.giProps || {}">
-              <n-form-item
-                :label="config.label"
-                :path="config.path"
-                v-bind="config.formItemProps || {}"
-                :show-feedback="false"
-              >
-                <component
-                  :is="config.control.component"
-                  v-model:value="props.formValue[config.path]"
-                  v-bind="config.control.props || {}"
-                />
-              </n-form-item>
-            </n-gi>
-          </template>
+  <Card>
+    <Form ref="formRef" :model="props.formValue" layout="horizontal">
+      <Row :gutter="[16, 12]">
+        <template v-for="config in itemsToDisplay" :key="config.path">
+          <Col :span="props.colSpan">
+            <FormItem
+              :label="config.label"
+              :name="config.path"
+              v-bind="config.formItemProps || {}"
+              class="!mb-0"
+            >
+              <component
+                :is="config.control.component"
+                v-model:value="props.formValue[config.path]"
+                v-bind="config.control.props || {}"
+                class="w-full rounded-md"
+              />
+            </FormItem>
+          </Col>
+        </template>
 
-          <n-gi :span="props.actionGiSpan">
-            <n-space justify="start" item style="width: 100%">
-              <n-button type="primary" @click="handleSearch">搜索</n-button>
-              <n-button @click="handleResetClick">重置</n-button>
-              <div
-                @click="toggleFilters"
-                v-if="props.itemConfigs.length > props.defaultVisibleItemsCount"
-                class="flex items-center cursor-pointer text-blue-500 justify-center h-full"
-              >
-                <CustomIcon name="LucideChevronUp" v-if="showAllFilters" />
-                <CustomIcon name="LucideChevronDown" v-else />
-                {{ showAllFilters ? "收起" : "展开" }}
-              </div>
-            </n-space>
-          </n-gi>
-        </n-grid>
-      </n-form>
-    </div>
-  </n-card>
+        <Col :span="props.colSpan">
+          <Space class="flex items-center">
+            <Button type="primary" @click="handleSearch">
+              <template #icon><SearchOutlined /></template>
+              搜索
+            </Button>
+            <Button @click="handleResetClick">
+              <template #icon><ReloadOutlined /></template>
+              重置
+            </Button>
+            <div
+              @click="toggleFilters"
+              v-if="props.itemConfigs.length > props.defaultVisibleItemsCount"
+              class="flex items-center cursor-pointer justify-center gap-0.5 hover:text-blue-500"
+            >
+              {{ showAllFilters ? "收起" : "展开" }}
+              <CustomIcon
+                :name="showAllFilters ? 'LucideChevronUp' : 'LucideChevronDown'"
+                :size="16"
+                is-only-icon
+              />
+            </div>
+          </Space>
+        </Col>
+      </Row>
+    </Form>
+  </Card>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, defineEmits, defineProps, type Component } from "vue";
-import {
-  NButton,
-  NCard,
-  NForm,
-  NFormItem,
-  NGrid,
-  NGi,
-  NSpace,
-  type FormInst,
-  type FormItemProps as NFormItemProps, // Renaming to avoid conflict if needed
-} from "naive-ui";
+import { ref, computed } from "vue";
+import { Button, Form, FormItem, Row, Col, Space, Card } from "ant-design-vue";
+import type { FormInstance, FormItemProps } from "ant-design-vue";
+import { SearchOutlined, ReloadOutlined } from "@ant-design/icons-vue";
 import CustomIcon from "@/components/CustomIcon.vue";
 
+// 表单控件配置接口
 interface FormItemControlConfig {
-  component: string | Component; // e.g., 'NInput', 'NSelect', or imported component object
-  props?: Record<string, any>; // Props for the control itself
+  component: any; // 控件组件，如 Input, Select 等
+  props?: Record<string, any>; // 控件属性
 }
 
+// 筛选项配置接口
 export interface FilterItemConfig {
-  // Exporting for use in parent component
-  path: string; // Used for formValue key and n-form-item path
-  label: string;
-  giProps?: Record<string, any>; // Props for n-gi, e.g., { span: 1 }
-  formItemProps?: Omit<NFormItemProps, "label" | "path">; // Additional props for n-form-item
-  control: FormItemControlConfig;
-  defaultValue?: any; // Optional: To help parent initialize formValue
+  path: string; // 表单数据字段名
+  label: string; // 表单项标签
+  colProps?: Record<string, any>; // Col组件的属性
+  formItemProps?: Omit<FormItemProps, "label" | "name">; // Form.Item的额外属性
+  control: FormItemControlConfig; // 控件配置
+  defaultValue?: any; // 可选：帮助父组件初始化表单数据
 }
 
-// Define props
-const props = defineProps({
-  formValue: {
-    // The form model, managed by the parent
-    type: Object as () => Record<string, any>,
-    required: true,
-  },
-  itemConfigs: {
-    // Array of configurations for each filter item
-    type: Array as () => FilterItemConfig[],
-    required: true,
-    default: () => [],
-  },
-  defaultVisibleItemsCount: {
-    // Number of items visible by default before expanding
-    type: Number,
-    default: 2,
-  },
-  gridCols: {
-    type: String,
-    default: "1 s:2 m:4", // Default grid column setup
-  },
-  actionGiSpan: {
-    // Span for the action buttons grid item
-    type: Number,
-    default: 1,
-  },
+// 使用TypeScript语法定义props
+interface Props {
+  formValue: Record<string, any>; // 表单数据，由父组件管理
+  itemConfigs: FilterItemConfig[]; // 筛选项配置数组
+  defaultVisibleItemsCount?: number; // 默认展示的筛选项数量
+  responsiveCol?: boolean; // 是否使用响应式布局
+  colSpan?: number; // 每个筛选项的默认列宽
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  itemConfigs: () => [],
+  defaultVisibleItemsCount: 2,
+  responsiveCol: true,
+  colSpan: 8, // 默认列宽为8
 });
 
-// Define emits
-const emit = defineEmits(["search", "reset"]);
+// 定义事件
+const emit = defineEmits<{
+  (e: "search", values: Record<string, any>): void;
+  (e: "reset"): void;
+}>();
 
-const formRef = ref<FormInst | null>(null);
-const showAllFilters = ref(false); // Changed from false to true
+const formRef = ref<FormInstance>();
+const showAllFilters = ref(false);
 
+// 计算需要显示的筛选项
 const itemsToDisplay = computed(() => {
   if (
     showAllFilters.value ||
@@ -121,21 +108,18 @@ const itemsToDisplay = computed(() => {
   return props.itemConfigs.slice(0, props.defaultVisibleItemsCount);
 });
 
+// 切换展开/收起状态
 const toggleFilters = () => {
   showAllFilters.value = !showAllFilters.value;
 };
 
+// 处理搜索事件
 const handleSearch = () => {
   emit("search", { ...props.formValue });
 };
 
+// 处理重置事件
 const handleResetClick = () => {
-  emit("reset"); // Parent is responsible for resetting formValue
-  // Optionally, reset showAllFilters state if desired upon reset
-  // showAllFilters.value = false;
+  emit("reset"); // 父组件负责重置表单数据
 };
 </script>
-
-<style scoped>
-/* Add any specific styles for this component if needed */
-</style>

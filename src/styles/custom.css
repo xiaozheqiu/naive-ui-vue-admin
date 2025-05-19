@@ -1,2 +1,18 @@
-.test_custom {
+.css-dev-only-do-not-override-f1wsx1.ant-btn > .anticon + span,
+.css-dev-only-do-not-override-f1wsx1.ant-btn > span + .anticon {
+  margin-left: 0px;
+}
+
+.ant-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  padding: 2px 8px !important;
+  gap: 4px !important;
+}
+.ant-btn > span {
+  margin: 0px !important;
+}
+
+.ant-card-body {
+  padding: 16px !important;
 }

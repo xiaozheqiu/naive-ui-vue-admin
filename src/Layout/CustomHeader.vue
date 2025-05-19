@@ -1,139 +1,158 @@
 <template>
-  <n-layout-header
-    class="h-[48px] px-2 flex justify-between items-center"
-    bordered
-    ><div class="flex justify-start items-center gap-2">
-      <custom-icon
+  <LayoutHeader
+    class="!pl-4 !pr-4 flex justify-between items-center !h-[56px]"
+    :style="{ background: token.colorBgContainer }"
+  >
+    <div class="flex justify-start items-center gap-2 flex-grow">
+      <CustomIcon
         v-if="isSidebarCollapsed"
         name="PanelLeftOpen"
         @click="setSidebarCollapsed(!isSidebarCollapsed)"
-      ></custom-icon>
-
-      <custom-icon
+      ></CustomIcon>
+      <CustomIcon
         v-if="!isSidebarCollapsed"
         name="PanelLeftClose"
         @click="setSidebarCollapsed(!isSidebarCollapsed)"
-      ></custom-icon>
-      <n-breadcrumb>
-        <n-breadcrumb-item @click="$router.push('/')">
-          <custom-icon name="House"></custom-icon>
-        </n-breadcrumb-item>
-        <n-breadcrumb-item
+      ></CustomIcon>
+
+      <!-- 路由导航栏 -->
+      <Breadcrumb>
+        <BreadcrumbItem @click="$router.push('/')">首页</BreadcrumbItem>
+        <BreadcrumbItem
           v-for="item in breadcrumbItems"
           :key="item.path"
           :clickable="false"
         >
           {{ item.meta?.title || item.name }}
-        </n-breadcrumb-item>
-      </n-breadcrumb>
+        </BreadcrumbItem>
+      </Breadcrumb>
     </div>
-    <div class="flex justify-end items-center gap-4">
-      <custom-icon
+    <div class="flex justify-end items-center gap-2">
+      <CustomIcon
         name="Expand"
         @click="fullScreenChange"
         v-if="!isFullscreen"
-      ></custom-icon>
-      <custom-icon
+      ></CustomIcon>
+      <CustomIcon
         name="Shrink"
         @click="fullScreenChange"
         v-if="isFullscreen"
-      ></custom-icon>
+      ></CustomIcon>
 
-      <custom-icon name="RotateCw" @click="reloadCurrentPage"></custom-icon>
+      <CustomIcon name="RotateCw" @click="reloadCurrentPage"></CustomIcon>
 
-      <n-popover>
-        <template #trigger>
-          <custom-icon name="Languages"></custom-icon>
+      <Dropdown>
+        <CustomIcon name="Languages" @click.prevent></CustomIcon>
+        <template #overlay>
+          <Menu>
+            <MenuItem v-for="option in languagesOptions" :key="option.key">
+              <a href="javascript:;" @click="option.click">
+                {{ option.label }}
+              </a>
+            </MenuItem>
+          </Menu>
         </template>
+      </Dropdown>
 
-        <div class="flex flex-col">
-          <n-button
-            :bordered="false"
-            v-for="option in languagesOptions"
-            :key="option.key"
-            @click="option.click"
-            >{{ option.label }}</n-button
-          >
-        </div>
-      </n-popover>
+      <CustomIcon name="Bell"></CustomIcon>
 
-      <custom-icon name="Bell"></custom-icon>
-
-      <custom-icon
+      <CustomIcon
         @click="changeTheme()"
         name="Moon"
         v-if="theme === 'dark'"
-      ></custom-icon>
+      ></CustomIcon>
 
-      <custom-icon
+      <CustomIcon
         @click="changeTheme()"
         name="Sun"
         v-if="theme !== 'dark'"
-      ></custom-icon>
+      ></CustomIcon>
 
-      <n-dropdown :options="dropdownOptions" @select="onDropdownSelect">
-        <div class="flex items-center gap-2 group">
-          <n-avatar
-            round
+      <Dropdown class="!leading-[40px]">
+        <div class="flex items-center group gap-0.5">
+          <Avatar
             size="small"
             src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg"
           />
-          <div class="">超级管理员</div>
-          <n-icon
+          <span>超级管理员</span>
+
+          <CustomIcon
+            name="ChevronDown"
             class="group-hover:text-green-500 transition-transform duration-300 group-hover:rotate-180 inline-flex items-center justify-center"
-          >
-            <custom-icon name="ChevronDown" class=" "></custom-icon>
-          </n-icon>
+            is-only-icon
+          ></CustomIcon>
         </div>
-      </n-dropdown>
+        <template #overlay>
+          <Menu @click="handleClick">
+            <MenuItem v-for="option in dropdownOptions" :key="option.key">
+              <CustomIcon :name="option.icon" :size="14" is-only-icon />
+              {{ option.label }}
+            </MenuItem>
+          </Menu>
+        </template>
+      </Dropdown>
     </div>
-  </n-layout-header>
+  </LayoutHeader>
 </template>
 
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
-import { icons, renderIcon } from "../tools/icons";
+import CustomIcon from "@/components/CustomIcon.vue";
 import { useSystemStore } from "../store/system";
-import { useMessage } from "naive-ui";
-import { onMounted, onUnmounted, ref, computed } from "vue";
+import {
+  message,
+  type MenuProps,
+  Dropdown,
+  Menu,
+  MenuItem,
+  Avatar,
+  Breadcrumb,
+  BreadcrumbItem,
+  LayoutHeader,
+} from "ant-design-vue";
+import { onMounted, onUnmounted, ref, computed, h } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useAuthStore } from "@/store/auth";
+import { theme as antTheme } from "ant-design-vue";
 const { theme, isSidebarCollapsed } = storeToRefs(useSystemStore());
 const { setSidebarCollapsed, changeTheme, setLanguage } = useSystemStore();
-const message = useMessage();
 const router = useRouter();
 const route = useRoute();
 const { clearAuthData } = useAuthStore();
+
+const { token } = antTheme.useToken();
 
 interface IProps {}
 const {} = defineProps<IProps>();
 // 响应式变量：是否处于全屏状态
 const isFullscreen = ref(false);
 
-const dropdownOptions = [
-  {
-    label: "用户资料",
-    key: "profile",
-    icon: renderIcon(icons.EarOffIcon),
-  },
-  {
-    label: "编辑用户资料",
-    key: "editProfile",
-    icon: renderIcon(icons.File),
-  },
-  {
-    label: "退出登录",
-    key: "logout",
-    icon: renderIcon(icons.Globe2),
-  },
-];
-
-function onDropdownSelect(key: string) {
+const handleClick: MenuProps["onClick"] = ({ key }) => {
   if (key === "logout") {
     clearAuthData();
     router.push("/login");
   }
-}
+};
+
+const dropdownOptions = [
+  {
+    label: "用户资料",
+    key: "profile",
+    icon: "EarOffIcon",
+  },
+  {
+    label: "编辑用户资料",
+    key: "editProfile",
+    icon: "File",
+  },
+  {
+    label: "退出登录",
+    key: "logout",
+    icon: "Globe2",
+  },
+];
+
+function onDropdownSelect(key: string) {}
 
 const languagesOptions = [
   {

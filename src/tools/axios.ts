@@ -8,10 +8,9 @@ import type {
   InternalAxiosRequestConfig,
   CancelTokenSource,
 } from "axios";
-import { createDiscreteApi } from "naive-ui";
+import { message as messageApi } from "ant-design-vue";
 import { storeToRefs } from "pinia";
 import { stringify } from "qs"; // 用于序列化参数
-const { message: MessageApi } = createDiscreteApi(["message"]);
 
 // 定义请求配置类型（可扩展）
 interface RequestConfig extends AxiosRequestConfig {
@@ -137,7 +136,7 @@ export class HttpService {
           errorMessage = `请求配置错误 ${message}`;
         }
 
-        MessageApi.error(`Error ${status}: ${errorMessage}`);
+        messageApi.error(`Error ${status}: ${errorMessage}`);
         return Promise.reject({
           status,
           message: errorMessage,
@@ -200,6 +199,14 @@ export class HttpService {
   // 封装 DELETE 请求
   public async delete<T>(url: string, config?: RequestConfig): Promise<T> {
     return this.instance.delete(url, config);
+  }
+
+  public async patch<T>(
+    url: string,
+    data?: any,
+    config?: RequestConfig,
+  ): Promise<T> {
+    return this.instance.patch(url, data, config);
   }
 
   // 文件上传

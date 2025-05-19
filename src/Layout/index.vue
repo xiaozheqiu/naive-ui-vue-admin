@@ -1,51 +1,47 @@
 <template>
   <div class="h-screen w-screen">
-    <n-layout has-sider class="h-screen w-screen flex flex-row">
-      <side-menus />
-
-      <n-layout
-        content-class="h-screen flex-grow flex flex-col"
-        :style="{
-          backgroundColor: systemStore.theme === 'dark' ? '#333' : '#f0f2f5',
-        }"
-      >
-        <custom-header />
+    <Layout class="h-screen w-screen flex flex-row">
+      <SideMenus />
+      <Layout>
+        <CustomHeader />
 
         <!-- 渲染路由标签记录 -->
-        <router-tag-history />
+        <!-- <RouterTagHistory /> -->
 
-        <div class="flex-grow relative overflow-hidden">
-          <!-- 渲染子路由 -->
-          <router-view
-            :key="routeKey"
-            v-slot="{ Component, route }"
-            class="h-full absolute inset-0 p-3"
-          >
-            <transition name="fade">
-              <component :is="Component" :key="route.path" />
-            </transition>
-          </router-view>
-        </div>
+        <LayoutContent>
+          <div class="relative overflow-hidden p-[12px] m-h-[360px]">
+            <!-- 渲染子路由 -->
+            <router-view
+              :key="routeKey"
+              v-slot="{ Component, route }"
+              class="h-full"
+            >
+              <transition name="fade">
+                <component :is="Component" :key="route.path" />
+              </transition>
+            </router-view>
+          </div>
+        </LayoutContent>
 
-        <n-layout-footer bordered class="h-10 flex items-center justify-center">
-          Footer Footer Footer
-        </n-layout-footer>
-      </n-layout>
-    </n-layout>
+        <a-layout-footer class="text-center !py-2">
+          Naive UI Admin ©2025 Created by Your Company
+        </a-layout-footer>
+      </Layout>
+    </Layout>
   </div>
 </template>
 
 <script setup lang="ts">
 import CustomHeader from "./CustomHeader.vue";
 import SideMenus from "./SideMenus.vue";
-import RouterTagHistory from "./RouterTagHistory.vue";
-import { useSystemStore } from "../store/system";
 import { ref, watch } from "vue";
 import { useRoute } from "vue-router";
-const systemStore = useSystemStore();
+import RouterTagHistory from "./RouterTagHistory.vue";
+import { Layout, LayoutContent } from "ant-design-vue";
 const route = useRoute();
 const routeKey = ref(route.fullPath);
 
+// 监听路由变化
 watch(
   () => route.fullPath,
   (newPath) => {
@@ -54,11 +50,13 @@ watch(
 );
 </script>
 
-<style>
+<style scoped>
+/* 保留原有的页面过渡效果 */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.5s ease-in-out;
 }
+
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;

@@ -16,8 +16,8 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
-    "lib": ["ES2023"],
-
+    "lib": ["esnext", "dom"],
+    
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,

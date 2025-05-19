@@ -1,19 +1,15 @@
 <template>
-  <n-layout-sider
-    bordered
-    show-trigger
-    collapse-mode="width"
+  <LayoutSider
     :collapsed-width="64"
-    :width="240"
-    :native-scrollbar="false"
-    style="max-height: 100%"
-    class="h-full flex flex-col"
+    :width="200"
+    :trigger="null"
+    :class="`h-full flex flex-col max-h-full ${theme === 'dark' ? '!bg-[#141414]' : ''}`"
     :collapsed="isSidebarCollapsed"
-    @collapse="setSidebarCollapsed(true)"
-    @expand="setSidebarCollapsed(false)"
+    @collapse="(val: boolean) => setSidebarCollapsed(val)"
+    :theme="theme"
   >
-    <div class="logo h-[48px] flex items-center gap-2 justify-center">
-      <img src="/logo.png" alt="Logo" class="h-8 w-8" />
+    <div class="logo h-[56px] flex items-center gap-2 justify-center">
+      <img src="/logo.svg" alt="Logo" class="h-8 w-8" />
       <div
         class="text-lg font-bold whitespace-nowrap overflow-hidden min-w-10"
         v-if="!isSidebarCollapsed"
@@ -21,38 +17,51 @@
         My Application
       </div>
     </div>
-    <n-menu
-      :collapsed-width="60"
-      :icon-size="18"
-      :collapsed-icon-size="18"
-      :options="sideMenusOptions"
-      class="flex-grow"
-      :value="currentKey"
-      @update:value="onMenuChange"
+    <Menu
+      :items="sideMenusOptions"
+      class="`flex-grow !px-2 ${theme === 'dark' ? '!bg-[#141414]' : ''}` flex-grow"
+      @select="(item) => onMenuChange(item.key as string)"
+      mode="inline"
+      v-model:selectedKeys="currentKey"
+      :inlineIndent="16"
     />
-  </n-layout-sider>
+  </LayoutSider>
 </template>
 
 <script setup lang="ts">
-import { type MenuOption } from "naive-ui";
 import { storeToRefs } from "pinia";
-import { ref } from "vue";
+import { ref, h, watch, onMounted } from "vue";
 import { useRouter, type RouteRecordRaw } from "vue-router";
 import { CommonRouter } from "../router/common";
+import { Menu, LayoutSider } from "ant-design-vue";
 import { useSystemStore } from "../store/system";
-import { renderIcon } from "../tools/icons";
+import CustomIcon from "@/components/CustomIcon.vue";
+const { theme } = storeToRefs(useSystemStore());
 
 const router = useRouter();
-const currentKey = ref(router.currentRoute.value.path);
+const currentKey = ref<string[]>([router.currentRoute.value.path]);
 
 const { isSidebarCollapsed } = storeToRefs(useSystemStore());
 const { setSidebarCollapsed } = useSystemStore();
 
-function onMenuChange(key: string, item: MenuOption) {
-  console.log(key, item, "onMenuChange", currentKey.value);
-  currentKey.value = key;
+function onMenuChange(key: string) {
+  console.log(key, "onMenuChange");
+  currentKey.value = [key];
   router.push(key);
 }
+
+// 监听路由变化，更新菜单选中状态
+watch(
+  () => router.currentRoute.value,
+  (route) => {
+    currentKey.value = [route.path];
+  },
+);
+
+// 组件挂载时，确保菜单选中状态与当前路由同步
+onMounted(() => {
+  currentKey.value = [router.currentRoute.value.path];
+});
 
 function mapRoutesToMenuOptions(
   routes: RouteRecordRaw[],
@@ -60,7 +69,7 @@ function mapRoutesToMenuOptions(
 ): Array<{
   label: string | undefined;
   key: string;
-  icon?: ReturnType<typeof renderIcon>;
+  icon?: any;
   children?: any;
 }> {
   return routes.map((route) => {
@@ -74,7 +83,13 @@ function mapRoutesToMenuOptions(
     return {
       label: route?.meta?.title as string | undefined,
       key: fullPath,
-      icon: route.meta?.icon ? renderIcon(route.meta.icon) : undefined,
+      icon: route.meta?.icon
+        ? () =>
+            h(CustomIcon, {
+              name: route?.meta?.icon as string,
+              isOnlyIcon: true,
+            })
+        : undefined,
       children: route.children
         ? mapRoutesToMenuOptions(route.children, fullPath)
         : undefined,
@@ -83,4 +98,5 @@ function mapRoutesToMenuOptions(
 }
 
 const sideMenusOptions = mapRoutesToMenuOptions(CommonRouter);
+console.log(sideMenusOptions, "sideMenusOptions");
 </script>

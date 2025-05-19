@@ -8,15 +8,7 @@ declare module "*.vue" {
 }
 
 // 扩展 Window 接口
-declare global {
-  interface Window {
-    $message: import('naive-ui').MessageApiInjection;
-    // 如果需要挂载其他 discrete API，也可以在这里添加
-    // $notification: import('naive-ui').NotificationApiInjection;
-    // $dialog: import('naive-ui').DialogApiInjection;
-    // $loadingBar: import('naive-ui').LoadingBarApiInjection;
-  }
-}
+declare global {}
 
 interface ImportMetaEnv {
   readonly VITE_APP_TITLE: string;
@@ -27,3 +19,5 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
+
+declare module "vue3-virtual-scroll-list";

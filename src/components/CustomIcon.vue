@@ -1,41 +1,49 @@
 <template>
-  <n-icon
+  <a-button
     v-if="!props.isOnlyIcon"
-    :size="props.size || 18"
-    :color="props.color"
-    @click="props.click"
-    :class="props?.class ?? 'hover:text-green-500'"
+    type="text"
+    :class="`!w-[30px] !h-[30px] !leading-[0] !p-0 flex items-center justify-center ${props.class}`"
   >
-    <component :is="icon" :strokeWidth="props.strokeWidth ?? 1" />
-  </n-icon>
+    <template #icon>
+      <component
+        :is="icons[props.name]"
+        v-bind="props"
+        :size="props.size || 18"
+        :color="props.color"
+        :stroke-width="props.strokeWidth || 1.5"
+        :absolute-stroke-width="props.absoluteStrokeWidth || false"
+        class="inline"
+      />
+    </template>
+    <slot />
+  </a-button>
 
   <component
     v-else
-    :is="icon"
-    :strokeWidth="props.strokeWidth ?? 1"
+    :is="icons[props.name]"
     :size="props.size || 18"
     :color="props.color"
-    @click="props.click"
-    :class="props?.class ?? ''"
+    :stroke-width="props.strokeWidth || 1.5"
+    :absolute-stroke-width="props.absoluteStrokeWidth || false"
+    class="inline"
+    :class="props.class"
   />
 </template>
 
 <script setup lang="ts">
 import { defineProps } from "vue";
-import { NIcon } from "naive-ui";
-import { icons } from "../tools/icons";
+import * as LucideIcons from "lucide-vue-next";
+const icons = LucideIcons;
 
-interface CustomIconProps {
-  name: keyof typeof icons;
+interface Props {
+  name: string;
   size?: number;
   color?: string;
   strokeWidth?: number;
-  class?: string | string[];
-  click?: () => void;
+  absoluteStrokeWidth?: boolean;
+  class?: string;
   isOnlyIcon?: boolean;
 }
 
-const props = defineProps<CustomIconProps>();
-
-const icon = icons?.[props?.name];
+const props = defineProps<Props>();
 </script>
